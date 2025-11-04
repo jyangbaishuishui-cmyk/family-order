@@ -2,626 +2,2561 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>家庭点餐平台</title>
-
-    <!-- PWA: Web App Manifest -->
-    <!-- PWA: 告诉浏览器清单文件的位置（关键！） -->
-    <link rel="manifest" href="/family-order/manifest.json" />
-
-    <!-- PWA: 主屏幕图标（Safari 兼容） -->
-    <link rel="apple-touch-icon" href="/family-order/icon-192.png" />
-    <meta name="apple-mobile-web-app-title" content="家庭点餐">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#4facfe">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-    <!-- PWA: Theme color for address bar -->
-    <meta name="theme-color" content="#4facfe">
-
+    <meta name="apple-mobile-web-app-title" content="家庭点餐">
+    <title>家庭点餐平台</title>
     <style>
-        /* ——— 你的原有 CSS ——— */
+        :root {
+            --primary: #4facfe;
+            --secondary: #00f2fe;
+            --success: #4caf50;
+            --danger: #ff6b6b;
+            --warning: #ffca28;
+            --info: #2196f3;
+            --dark: #343a40;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --border-radius: 16px;
+            --shadow: 0 4px 12px rgba(0,0,0,0.1);
+            --shadow-hover: 0 8px 24px rgba(0,0,0,0.15);
+            --transition: all 0.3s ease;
+        }
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
         }
+        
         body {
-            background-color: #f5f5f5;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
             color: #333;
             line-height: 1.6;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            overscroll-behavior: none;
         }
+        
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 10px;
         }
+        
+        /* Global Navigation */
+        .global-nav {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            border-radius: 28px;
+            padding: 8px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            z-index: 1000;
+            display: flex;
+            gap: 8px;
+            max-width: 90%;
+            overflow-x: auto;
+        }
+        
+        .nav-item {
+            flex: 1;
+            min-width: 70px;
+            padding: 12px 8px;
+            text-align: center;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .nav-item.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
+        }
+        
+        .nav-icon {
+            font-size: 20px;
+        }
+        
+        .global-nav::-webkit-scrollbar {
+            display: none;
+        }
+        
+        /* Header Styles */
         .header {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
             padding: 20px;
-            border-radius: 16px;
+            border-radius: var(--border-radius);
             margin-bottom: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
             text-align: center;
             position: relative;
-        }
-        .header h1 {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-        .header p {
-            font-size: 16px;
-            opacity: 0.9;
-            font-weight: 500;
-        }
-        .share-section {
-            background: rgba(255,255,255,0.2);
-            padding: 12px;
-            border-radius: 12px;
-            margin-top: 12px;
-            display: flex;
-            gap: 10px;
-        }
-        .share-input {
-            flex: 1;
-            padding: 8px 12px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-        .copy-btn {
-            background: white;
-            color: #4facfe;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .main-content {
-            display: flex;
-            gap: 24px;
-            flex-wrap: wrap;
-        }
-        .menu-section {
-            flex: 3;
-            min-width: 300px;
-            background: white;
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        .order-section {
-            flex: 2;
-            min-width: 280px;
-            background: white;
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 20px;
-            height: fit-content;
-        }
-        .section-title {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: #333;
-            padding-bottom: 12px;
-            border-bottom: 2px solid #f0f0f0;
-        }
-        .categories {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-        }
-        .category-btn {
-            padding: 10px 16px;
-            border: 2px solid #e1e5e9;
-            border-radius: 20px;
-            background: white;
-            color: #666;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-        }
-        .category-btn.active,
-        .category-btn:hover {
-            border-color: #4facfe;
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: white;
-        }
-        .food-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 20px;
-        }
-        .food-card {
-            background: white;
-            border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            transition: all 0.3s ease;
-            border: 2px solid #f8f9fa;
         }
-        .food-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-            border-color: #4facfe;
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
         }
-        .food-image {
-            width: 100%;
-            height: 160px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 48px;
-        }
-        .food-info {
-            padding: 16px;
-        }
-        .food-name {
-            font-size: 18px;
+        
+        .date-time {
+            font-size: 24px;
             font-weight: 700;
-            color: #333;
             margin-bottom: 8px;
-            line-height: 1.4;
+            position: relative;
         }
-        .food-desc {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 12px;
-            min-height: 40px;
-        }
-        .food-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .food-price {
-            font-size: 20px;
-            font-weight: 700;
-            color: #4facfe;
-        }
-        .add-to-cart {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: white;
-            border: none;
-            padding: 8px 16px;
+        
+        .user-display {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: rgba(0,0,0,0.2);
+            padding: 6px 14px;
             border-radius: 20px;
             font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .add-to-cart:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 12px rgba(79, 172, 254, 0.4);
-        }
-        .order-items {
-            margin-bottom: 24px;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        .order-item {
-            display: flex;
-            align-items: center;
-            padding: 16px;
-            background: #f8f9fa;
-            border-radius: 12px;
-            margin-bottom: 12px;
-            border-left: 4px solid #4facfe;
-        }
-        .item-info {
-            flex: 1;
-            margin-right: 12px;
-        }
-        .item-name {
-            font-weight: 600;
             font-size: 16px;
-            color: #333;
-            margin-bottom: 4px;
-        }
-        .item-price {
-            font-size: 14px;
-            color: #4facfe;
-            font-weight: 500;
-        }
-        .item-controls {
             display: flex;
             align-items: center;
             gap: 8px;
         }
-        .control-btn {
-            width: 28px;
-            height: 28px;
-            border-radius: 6px;
+        
+        .shop-display {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            margin-top: 10px;
+        }
+        
+        .shop-name {
+            font-weight: 600;
+        }
+        
+        .change-shop-btn {
+            background: rgba(0, 0, 0, 0.2);
             border: none;
-            background: #4facfe;
             color: white;
-            font-weight: bold;
-            cursor: pointer;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
-            transition: all 0.2s ease;
-        }
-        .control-btn.minus {
-            background: #6c757d;
-        }
-        .control-btn:hover {
-            transform: scale(1.1);
-        }
-        .quantity-display {
-            min-width: 24px;
-            text-align: center;
-            font-weight: 600;
-            font-size: 16px;
-        }
-        .total-section {
-            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .total-label {
-            font-size: 16px;
-            color: #666;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-        .total-amount {
-            font-size: 24px;
-            font-weight: 700;
-            color: #4facfe;
-            background: white;
-            padding: 12px 20px;
-            border-radius: 12px;
-            display: inline-block;
-            min-width: 120px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        .checkout-btn {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: white;
-            border: none;
-            padding: 16px;
-            border-radius: 12px;
-            font-size: 18px;
-            font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
-            margin-top: 10px;
+            transition: var(--transition);
         }
-        .checkout-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(79, 172, 254, 0.3);
+        
+        .change-shop-btn:hover {
+            background: rgba(0, 0, 0, 0.3);
         }
-        .checkout-btn:disabled {
-            background: #ccc;
+        
+        .back-btn-global {
+            position: absolute;
+            left: 16px;
+            top: 16px;
+            background: rgba(0,0,0,0.2);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 18px;
+            color: white;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .back-btn-global:hover {
+            background: rgba(0,0,0,0.3);
+            transform: scale(1.05);
+        }
+        
+        .back-btn-global:disabled {
+            opacity: 0.5;
             cursor: not-allowed;
             transform: none;
-            box-shadow: none;
         }
+        
+        /* Pages */
+        .page {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Identity Page */
+        .identity-page {
+            text-align: center;
+            padding: 40px 20px;
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .identity-title {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+        
+        .identity-instruction {
+            font-size: 18px;
+            margin-bottom: 30px;
+            color: var(--dark);
+            opacity: 0.9;
+        }
+        
+        .identity-options {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .identity-option {
+            background: white;
+            border: 2px solid var(--gray);
+            border-radius: 16px;
+            padding: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: left;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .identity-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary);
+        }
+        
+        .identity-option:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .identity-option.new {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-color: transparent;
+        }
+        
+        .identity-option .option-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .identity-option .option-desc {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .identity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            background: white;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 20px;
+            border: 2px solid currentColor;
+        }
+        
+        .new-identity-form {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: var(--transition);
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.3);
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--gray);
+            color: var(--dark);
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(79, 172, 254, 0.4);
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* Shop Selection Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal {
+            background: white;
+            border-radius: 20px;
+            max-width: 400px;
+            width: 90%;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .modal-title {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--primary);
+            font-size: 22px;
+        }
+        
+        .shop-options {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .shop-option {
+            background: white;
+            border: 2px solid var(--gray);
+            border-radius: 16px;
+            padding: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: left;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .shop-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary);
+        }
+        
+        .shop-option:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .shop-option .option-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .shop-option .option-desc {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .shop-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 18px;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        /* Home Page Elements */
+        .meal-tabs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .meal-tab {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 24px 16px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .meal-tab:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .meal-tab.active {
+            box-shadow: 0 0 0 3px var(--primary), var(--shadow-hover);
+        }
+        
+        .meal-tab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+        
+        .meal-icon {
+            font-size: 36px;
+            margin-bottom: 12px;
+        }
+        
+        .meal-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .meal-status {
+            font-size: 14px;
+            color: var(--gray);
+        }
+        
+        .meal-tab.order-placed .meal-status {
+            color: var(--success);
+            font-weight: 500;
+        }
+        
+        /* Food Items */
+        .menu-section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+        }
+        
+        .section-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f0f0f0;
+            justify-content: space-between;
+        }
+        
+        .add-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .add-btn:hover {
+            background: #3a9fe0;
+            transform: translateY(-1px);
+        }
+        
+        .reset-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .reset-btn:hover {
+            background: #e55a1c;
+            transform: translateY(-1px);
+        }
+        
+        .categories-container {
+            margin-bottom: 24px;
+        }
+        
+        .category-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .category-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .food-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 16px;
+        }
+        
+        .food-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+        
+        .food-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+        }
+        
+        .food-card.selected {
+            border-color: var(--primary);
+            background: rgba(79, 172, 254, 0.08);
+            box-shadow: 0 0 0 2px rgba(79, 172, 254, 0.3);
+        }
+        
+        .food-emoji {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+        
+        .food-name {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+        
+        .food-price {
+            font-size: 14px;
+            color: var(--primary);
+            font-weight: 500;
+        }
+        
+        /* Order Summary */
+        .order-section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+        }
+        
+        .selected-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .selected-item {
+            background: var(--primary);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .remove-item {
+            background: rgba(255,255,255,0.3);
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .remove-item:hover {
+            background: rgba(255,255,255,0.5);
+            transform: scale(1.1);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        /* Empty State */
         .empty-state {
             text-align: center;
             padding: 40px 20px;
             color: #666;
         }
+        
         .empty-state i {
             font-size: 48px;
             margin-bottom: 16px;
             color: #e9ecef;
             display: block;
         }
-        .order-header {
+        
+        .empty-state p {
+            font-size: 16px;
+            margin-top: 12px;
+        }
+        
+        /* History */
+        .history-section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+        }
+        
+        .history-item {
+            padding: 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        
+        .history-date {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+        
+        .history-meals {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        
+        .history-meal {
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .meal-type {
+            font-size: 14px;
+            color: var(--gray);
+            margin-bottom: 4px;
+        }
+        
+        .meal-content {
+            font-weight: 500;
+        }
+        
+        .meal-content.empty {
+            color: var(--gray);
+            font-style: italic;
+        }
+        
+        .orderer-info {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 4px;
+            font-size: 12px;
+            color: var(--gray);
+        }
+        
+        .orderer-icon {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            border: 1px solid currentColor;
+        }
+        
+        /* Management Page */
+        .management-section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+        }
+        
+        .management-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .management-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
+            padding: 16px;
+            border-bottom: 1px solid #f0f0f0;
         }
-        .clear-btn {
-            background: #ff6b6b;
+        
+        .management-item:last-child {
+            border-bottom: none;
+        }
+        
+        .item-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .item-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 18px;
+            background: var(--primary);
             color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .item-details {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .item-name {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .item-meta {
+            font-size: 14px;
+            color: var(--gray);
+        }
+        
+        .item-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            background: none;
             border: none;
             padding: 6px 12px;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 14px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: var(--transition);
         }
-        .clear-btn:hover {
-            background: #ee5a24;
+        
+        .edit-btn {
+            background: var(--info);
+            color: white;
         }
-        .scrollbar {
-            scrollbar-width: thin;
-            scrollbar-color: #4facfe #f0f0f0;
+        
+        .delete-btn {
+            background: var(--danger);
+            color: white;
         }
-        .scrollbar::-webkit-scrollbar {
-            width: 6px;
+        
+        .bind-btn {
+            background: var(--success);
+            color: white;
         }
-        .scrollbar::-webkit-scrollbar-track {
-            background: #f0f0f0;
-            border-radius: 3px;
+        
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--success);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 24px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
-        .scrollbar::-webkit-scrollbar-thumb {
-            background: #4facfe;
-            border-radius: 3px;
+        
+        .notification.show {
+            opacity: 1;
         }
+        
+        .notification.error {
+            background: var(--danger);
+        }
+        
+        /* Binding Modal */
+        .binding-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .binding-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+        
+        .binding-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .binding-checkbox {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 2px solid var(--gray);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+        
+        .binding-checkbox.checked {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+        
+        .binding-status {
+            font-size: 14px;
+            color: var(--gray);
+        }
+        
+        /* Responsive Design */
         @media (max-width: 768px) {
-            .main-content {
+            .meal-tabs {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .food-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            }
+            
+            .action-buttons {
                 flex-direction: column;
             }
-            .order-section {
-                position: static;
+            
+            .btn {
+                width: 100%;
             }
-            .food-grid {
+            
+            .header {
+                padding: 16px;
+            }
+            
+            .date-time {
+                font-size: 20px;
+            }
+            
+            .global-nav {
+                padding: 6px;
+            }
+            
+            .nav-item {
+                padding: 10px 6px;
+                font-size: 12px;
+            }
+            
+            .nav-icon {
+                font-size: 18px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .meal-tabs {
                 grid-template-columns: 1fr;
             }
-            .share-section {
-                flex-direction: column;
+            
+            .header {
+                padding: 12px;
+            }
+            
+            .date-time {
+                font-size: 18px;
+            }
+            
+            .user-display {
+                top: 12px;
+                right: 12px;
+                padding: 4px 10px;
+                font-size: 14px;
+            }
+            
+            .back-btn-global {
+                width: 32px;
+                height: 32px;
+                font-size: 16px;
+            }
+            
+            .section-title {
+                font-size: 20px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>🍽️ 家庭点餐平台</h1>
-            <p>家人们可以点餐，订单会生成分享链接</p>
-            <div class="share-section">
-                <input type="text" id="shareUrl" class="share-input" placeholder="订单分享链接（复制后发送给家人）" readonly>
-                <button class="copy-btn" onclick="copyShareUrl()">复制链接</button>
+        <!-- Identity Selection Page - ALWAYS FIRST -->
+        <div id="identityPage" class="page active">
+            <div class="identity-page">
+                <h1 class="identity-title">🏠 选择身份</h1>
+                <p class="identity-instruction">这是第一步，必须先选择身份才能使用其他功能</p>
+                
+                <div class="identity-options" id="identityOptions">
+                    <!-- Identities will be populated dynamically -->
+                </div>
+                
+                <div class="new-identity-form" id="newIdentityForm">
+                    <div class="form-group">
+                        <label class="form-label">新身份名称</label>
+                        <input type="text" class="form-control" id="newIdentityName" placeholder="例如：白水、张三、李四">
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn btn-outline" id="cancelNewIdentityBtn">取消</button>
+                        <button class="btn btn-primary" id="createIdentityBtn">创建身份</button>
+                    </div>
+                </div>
             </div>
         </div>
         
-        <div class="main-content">
-            <div class="menu-section">
-                <h2 class="section-title">📋 菜单</h2>
-                <div class="categories">
-                    <button class="category-btn active">全部</button>
-                    <button class="category-btn">主食</button>
-                    <button class="category-btn">饮品</button>
-                    <button class="category-btn">甜点</button>
-                    <button class="category-btn">小食</button>
+        <!-- Home Page -->
+        <div id="homePage" class="page">
+            <div class="header">
+                <button class="back-btn-global" id="backBtnGlobal">👤</button>
+                <div class="date-time" id="dateTimeDisplay">2023年5月15日 星期一</div>
+                <div class="user-display" id="userDisplay">
+                    <div class="identity-icon" id="userIcon">👤</div>
+                    <span id="userNameDisplay">用户</span>
                 </div>
-                <div class="food-grid" id="foodGrid"></div>
+                <div class="shop-display">
+                    <span class="shop-name" id="currentShopName">店铺名称</span>
+                    <button class="change-shop-btn" id="changeShopBtn">↻</button>
+                </div>
+            </div>
+            
+            <h2 class="section-title">🍚 今日餐食</h2>
+            
+            <div class="meal-tabs" id="mealTabs">
+                <div class="meal-tab" data-meal="breakfast">
+                    <div class="meal-icon">🌅</div>
+                    <div class="meal-name">早餐</div>
+                    <div class="meal-status">未点餐</div>
+                </div>
+                <div class="meal-tab" data-meal="lunch">
+                    <div class="meal-icon">☀️</div>
+                    <div class="meal-name">午餐</div>
+                    <div class="meal-status">未点餐</div>
+                </div>
+                <div class="meal-tab" data-meal="dinner">
+                    <div class="meal-icon">🌇</div>
+                    <div class="meal-name">晚餐</div>
+                    <div class="meal-status">未点餐</div>
+                </div>
+                <div class="meal-tab" data-meal="night">
+                    <div class="meal-icon">🌙</div>
+                    <div class="meal-name">夜宵</div>
+                    <div class="meal-status">未点餐</div>
+                </div>
+            </div>
+            
+            <div class="history-section">
+                <h2 class="section-title">📊 点餐历史</h2>
+                <div id="historyList">
+                    <div class="empty-state">
+                        <div>📅</div>
+                        <p>暂无点餐历史<br>开始今天的点餐吧</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Order Page -->
+        <div id="orderPage" class="page">
+            <div class="header">
+                <button class="back-btn-global" id="backBtnGlobalOrder">←</button>
+                <div class="date-time" id="orderDateTime">2023年5月15日</div>
+                <div class="user-display" id="orderUserDisplay">
+                    <div class="identity-icon" id="orderUserIcon">👤</div>
+                    <span id="orderUserName">用户</span>
+                </div>
+            </div>
+            
+            <div class="menu-section">
+                <h2 class="section-title" id="currentMealTitle">🌅 早餐</h2>
+                <div id="categoriesContainer" class="categories-container">
+                    <!-- Categories will be dynamically added here -->
+                </div>
             </div>
             
             <div class="order-section">
-                <div class="order-header">
-                    <h2 class="section-title">🛒 我的订单</h2>
-                    <button class="clear-btn" onclick="clearOrder()" id="clearBtn">清空</button>
-                </div>
-                <div class="order-items scrollbar" id="orderItems">
-                    <div class="empty-state">
+                <h2 class="section-title">✅ 已选菜品</h2>
+                <div class="selected-items" id="selectedItems">
+                    <div class="empty-state" style="padding: 20px; margin: 0;">
                         <div>🛒</div>
-                        <p>购物车为空<br>选择菜品开始点餐</p>
+                        <p>暂未选择菜品<br>点击上方菜品添加</p>
                     </div>
                 </div>
-                <div class="total-section">
-                    <div class="total-label">总计</div>
-                    <div class="total-amount" id="totalAmount">0积分</div>
+                <div class="action-buttons">
+                    <button class="btn btn-outline" id="clearSelectionBtn">清空选择</button>
+                    <button class="btn btn-primary" id="submitOrderBtn" disabled>确认点餐</button>
                 </div>
-                <button class="checkout-btn" onclick="submitOrder()">提交订单</button>
+            </div>
+        </div>
+        
+        <!-- Management Page -->
+        <div id="managementPage" class="page">
+            <div class="header">
+                <button class="back-btn-global" id="backBtnGlobalManagement">←</button>
+                <div class="date-time">管理</div>
+                <div class="user-display" id="managementUserDisplay">
+                    <div class="identity-icon" id="managementUserIcon">👤</div>
+                    <span id="managementUserName">用户</span>
+                </div>
+            </div>
+            
+            <div class="management-section">
+                <h2 class="section-title">👤 身份管理</h2>
+                <div class="management-list" id="identityManagementList">
+                    <!-- Identities will be populated dynamically -->
+                </div>
+                <div class="form-actions" style="margin-top: 20px;">
+                    <button class="btn btn-primary" id="addIdentityBtn">添加身份</button>
+                </div>
+            </div>
+            
+            <div class="management-section">
+                <h2 class="section-title">🏪 店铺管理</h2>
+                <div class="management-list" id="shopManagementList">
+                    <!-- Shops will be populated dynamically -->
+                </div>
+                <div class="form-actions" style="margin-top: 20px;">
+                    <button class="btn btn-primary" id="addShopBtn">添加店铺</button>
+                </div>
+            </div>
+            
+            <div class="management-section">
+                <h2 class="section-title">🍽️ 菜品管理</h2>
+                <div class="management-list" id="foodManagementList">
+                    <!-- Foods will be populated dynamically -->
+                </div>
+                <div class="form-actions" style="margin-top: 20px;">
+                    <button class="btn btn-primary" id="addFoodBtn">添加菜品</button>
+                </div>
+            </div>
+            
+            <div class="management-section">
+                <h2 class="section-title">🔔 绑定设置</h2>
+                <div class="management-list" id="bindingManagementList">
+                    <!-- Bindings will be populated dynamically -->
+                </div>
+                <div class="form-actions" style="margin-top: 20px;">
+                    <button class="btn btn-primary" id="manageBindingsBtn">管理绑定</button>
+                </div>
+            </div>
+            
+            <div class="management-section">
+                <h2 class="section-title">🧹 数据管理</h2>
+                <div class="action-buttons">
+                    <button class="btn btn-outline" id="exportDataBtn">导出数据</button>
+                    <button class="btn btn-outline" id="importDataBtn">导入数据</button>
+                    <button class="btn btn-danger" id="resetAllDataBtn">重置所有数据</button>
+                </div>
             </div>
         </div>
     </div>
+    
+    <!-- Shop Selection Modal -->
+    <div class="modal-overlay" id="shopModal">
+        <div class="modal">
+            <h3 class="modal-title">🏪 选择店铺</h3>
+            <div class="shop-options" id="shopOptions">
+                <!-- Shops will be populated dynamically -->
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-outline" id="cancelShopBtn">取消</button>
+                <button class="btn btn-primary" id="createShopBtn">创建新店铺</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Create Shop Modal -->
+    <div class="modal-overlay" id="createShopModal">
+        <div class="modal">
+            <h3 class="modal-title">创建新店铺</h3>
+            <div class="form-group">
+                <label class="form-label">店铺名称</label>
+                <input type="text" class="form-control" id="newShopName" placeholder="例如：爸妈家、姐姐家、佳佳家">
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-outline" id="cancelCreateShopBtn">取消</button>
+                <button class="btn btn-primary" id="confirmCreateShopBtn">创建店铺</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Binding Modal -->
+    <div class="modal-overlay" id="bindingModal">
+        <div class="modal">
+            <h3 class="modal-title">🔔 绑定设置</h3>
+            <p style="margin-bottom: 16px; color: var(--gray);">绑定后，当有人修改或确定点餐时，您会收到通知</p>
+            <div class="binding-list" id="bindingList">
+                <!-- Bindings will be populated dynamically -->
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-outline" id="cancelBindingBtn">取消</button>
+                <button class="btn btn-primary" id="saveBindingBtn">保存设置</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Global Navigation -->
+    <div class="global-nav" id="globalNav">
+        <div class="nav-item active" data-page="homePage">
+            <div class="nav-icon">🏠</div>
+            <div>首页</div>
+        </div>
+        <div class="nav-item" data-page="orderPage" style="display: none;" id="orderNavTab">
+            <div class="nav-icon">🍽️</div>
+            <div>点餐</div>
+        </div>
+        <div class="nav-item" data-page="managementPage">
+            <div class="nav-icon">⚙️</div>
+            <div>管理</div>
+        </div>
+    </div>
+    
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
 
     <script>
-        // PWA: 注册 Service Worker
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').catch(err => {
-                    console.log('Service Worker 注册失败:', err);
-                });
-            });
-        }
-
-        // 菜单数据（你的原有逻辑）
-        const menuData = [
-            { id: 1, name: "经典牛肉汉堡", description: "100%纯牛肉，新鲜蔬菜，特制酱料", price: "25积分", category: "主食", emoji: "🍔" },
-            { id: 2, name: "香脆炸鸡套餐", description: "外酥里嫩炸鸡，搭配薯条和饮料", price: "20积分", category: "主食", emoji: "🍗" },
-            { id: 3, name: "夏威夷披萨", description: "火腿、菠萝、芝士，美味组合", price: "30积分", category: "主食", emoji: "🍕" },
-            { id: 4, name: "冰镇可乐", description: "经典碳酸饮料，冰爽畅快", price: "8积分", category: "饮品", emoji: "🥤" },
-            { id: 5, name: "鲜榨橙汁", description: "100%新鲜橙子现榨", price: "12积分", category: "饮品", emoji: "🍹" },
-            { id: 6, name: "抹茶拿铁", description: "日式抹茶与牛奶的完美融合", price: "15积分", category: "饮品", emoji: "🍵" },
-            { id: 7, name: "提拉米苏", description: "意大利经典甜点，咖啡与奶香", price: "18积分", category: "甜点", emoji: "🍰" },
-            { id: 8, name: "巧克力熔岩蛋糕", description: "热巧克力流心，搭配香草冰淇淋", price: "22积分", category: "甜点", emoji: "🍫" },
-            { id: 9, name: "薯条", description: "金黄酥脆，搭配特制番茄酱", price: "10积分", category: "小食", emoji: "🍟" },
-            { id: 10, name: "鸡米花", description: "香脆可口，多种口味可选", price: "12积分", category: "小食", emoji: "🍗" },
-            { id: 11, name: "蔬菜沙拉", description: "新鲜时蔬，健康美味", price: "15积分", category: "小食", emoji: "🥗" },
-            { id: 12, name: "水果拼盘", description: "当季新鲜水果，营养丰富", price: "16积分", category: "甜点", emoji: "🍓" }
+        // DOM Elements
+        const identityPage = document.getElementById('identityPage');
+        const homePage = document.getElementById('homePage');
+        const orderPage = document.getElementById('orderPage');
+        const managementPage = document.getElementById('managementPage');
+        const identityOptions = document.getElementById('identityOptions');
+        const newIdentityForm = document.getElementById('newIdentityForm');
+        const newIdentityName = document.getElementById('newIdentityName');
+        const createIdentityBtn = document.getElementById('createIdentityBtn');
+        const cancelNewIdentityBtn = document.getElementById('cancelNewIdentityBtn');
+        const shopModal = document.getElementById('shopModal');
+        const shopOptions = document.getElementById('shopOptions');
+        const createShopBtn = document.getElementById('createShopBtn');
+        const cancelShopBtn = document.getElementById('cancelShopBtn');
+        const createShopModal = document.getElementById('createShopModal');
+        const newShopName = document.getElementById('newShopName');
+        const cancelCreateShopBtn = document.getElementById('cancelCreateShopBtn');
+        const confirmCreateShopBtn = document.getElementById('confirmCreateShopBtn');
+        const dateTimeDisplay = document.getElementById('dateTimeDisplay');
+        const mealTabs = document.getElementById('mealTabs');
+        const historyList = document.getElementById('historyList');
+        const userDisplay = document.getElementById('userDisplay');
+        const userIcon = document.getElementById('userIcon');
+        const userNameDisplay = document.getElementById('userNameDisplay');
+        const currentShopName = document.getElementById('currentShopName');
+        const changeShopBtn = document.getElementById('changeShopBtn');
+        const orderDateTime = document.getElementById('orderDateTime');
+        const currentMealTitle = document.getElementById('currentMealTitle');
+        const categoriesContainer = document.getElementById('categoriesContainer');
+        const selectedItems = document.getElementById('selectedItems');
+        const clearSelectionBtn = document.getElementById('clearSelectionBtn');
+        const submitOrderBtn = document.getElementById('submitOrderBtn');
+        const orderUserDisplay = document.getElementById('orderUserDisplay');
+        const orderUserIcon = document.getElementById('orderUserIcon');
+        const orderUserName = document.getElementById('orderUserName');
+        const managementUserDisplay = document.getElementById('managementUserDisplay');
+        const managementUserIcon = document.getElementById('managementUserIcon');
+        const managementUserName = document.getElementById('managementUserName');
+        const identityManagementList = document.getElementById('identityManagementList');
+        const shopManagementList = document.getElementById('shopManagementList');
+        const foodManagementList = document.getElementById('foodManagementList');
+        const bindingManagementList = document.getElementById('bindingManagementList');
+        const addIdentityBtn = document.getElementById('addIdentityBtn');
+        const addShopBtn = document.getElementById('addShopBtn');
+        const addFoodBtn = document.getElementById('addFoodBtn');
+        const manageBindingsBtn = document.getElementById('manageBindingsBtn');
+        const exportDataBtn = document.getElementById('exportDataBtn');
+        const importDataBtn = document.getElementById('importDataBtn');
+        const resetAllDataBtn = document.getElementById('resetAllDataBtn');
+        const backBtnGlobal = document.getElementById('backBtnGlobal');
+        const backBtnGlobalOrder = document.getElementById('backBtnGlobalOrder');
+        const backBtnGlobalManagement = document.getElementById('backBtnGlobalManagement');
+        const orderNavTab = document.getElementById('orderNavTab');
+        const globalNav = document.getElementById('globalNav');
+        const notification = document.getElementById('notification');
+        const bindingModal = document.getElementById('bindingModal');
+        const bindingList = document.getElementById('bindingList');
+        const cancelBindingBtn = document.getElementById('cancelBindingBtn');
+        const saveBindingBtn = document.getElementById('saveBindingBtn');
+        
+        // App State
+        let currentUserId = null;
+        let currentUser = null;
+        let currentShopId = null;
+        let currentShop = null;
+        let currentMealType = 'breakfast';
+        let selectedFoods = [];
+        let currentPage = 'identityPage';
+        
+        // Initialize app data from localStorage
+        let identities = JSON.parse(localStorage.getItem('identities')) || [
+            { id: 'bai', name: '白水', color: '#4facfe' }
         ];
-
-        let currentOrder = [];
-
-        // ——— 以下是你原有的 JS 逻辑（已保留）———
-        function getUrlParameter(name) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(name);
+        
+        let shops = JSON.parse(localStorage.getItem('shops')) || [
+            { id: 'parents', name: '爸妈家', color: '#4facfe' },
+            { id: 'sister', name: '姐姐家', color: '#ff6b6b' },
+            { id: 'jiajia', name: '佳佳家', color: '#43e97b' }
+        ];
+        
+        let categories = JSON.parse(localStorage.getItem('categories')) || {};
+        let foods = JSON.parse(localStorage.getItem('foods')) || {};
+        let orders = JSON.parse(localStorage.getItem('orders')) || {};
+        let bindings = JSON.parse(localStorage.getItem('bindings')) || {};
+        
+        const today = new Date().toISOString().split('T')[0];
+        
+        // Initialize default categories and foods for each shop
+        shops.forEach(shop => {
+            if (!categories[shop.id]) {
+                categories[shop.id] = [
+                    { id: generateId(), name: '大荤', order: 1 },
+                    { id: generateId(), name: '小荤', order: 2 },
+                    { id: generateId(), name: '素菜', order: 3 },
+                    { id: generateId(), name: '汤类', order: 4 },
+                    { id: generateId(), name: '甜品', order: 5 },
+                    { id: generateId(), name: '小吃', order: 6 },
+                    { id: generateId(), name: '饮料', order: 7 }
+                ];
+            }
+            
+            if (!foods[shop.id]) {
+                const shopCategories = categories[shop.id];
+                foods[shop.id] = [
+                    { id: generateId(), name: '红烧肉', categoryId: shopCategories[0].id, emoji: '🍖', price: 28 },
+                    { id: generateId(), name: '清蒸鱼', categoryId: shopCategories[0].id, emoji: '🐟', price: 32 },
+                    { id: generateId(), name: '宫保鸡丁', categoryId: shopCategories[1].id, emoji: '🍗', price: 25 },
+                    { id: generateId(), name: '西红柿炒蛋', categoryId: shopCategories[2].id, emoji: '🍳', price: 18 },
+                    { id: generateId(), name: '青菜', categoryId: shopCategories[2].id, emoji: '🥬', price: 12 },
+                    { id: generateId(), name: '紫菜蛋花汤', categoryId: shopCategories[3].id, emoji: '🍲', price: 10 },
+                    { id: generateId(), name: '冰淇淋', categoryId: shopCategories[4].id, emoji: '🍦', price: 15 },
+                    { id: generateId(), name: '水果拼盘', categoryId: shopCategories[4].id, emoji: '🍓', price: 22 },
+                    { id: generateId(), name: '春卷', categoryId: shopCategories[5].id, emoji: '🥠', price: 16 },
+                    { id: generateId(), name: '可乐', categoryId: shopCategories[6].id, emoji: '🥤', price: 8 },
+                    { id: generateId(), name: '豆浆', categoryId: shopCategories[6].id, emoji: '🥛', price: 6 }
+                ];
+            }
+        });
+        
+        // Initialize bindings for each identity
+        identities.forEach(identity => {
+            if (!bindings[identity.id]) {
+                bindings[identity.id] = [];
+            }
+        });
+        
+        // Save initial data
+        saveIdentities();
+        saveShops();
+        saveCategories();
+        saveFoods();
+        saveBindings();
+        
+        // Initialize the app
+        function initApp() {
+            console.log('Application starting...');
+            
+            // ALWAYS start at identity page
+            showPage('identityPage');
+            renderIdentityOptions();
+            setupEventListeners();
+            updateDateTime();
+            
+            console.log('Application initialized');
         }
-        function setUrlParameter(paramObj) {
-            const url = new URL(window.location);
-            Object.keys(paramObj).forEach(key => {
-                if (paramObj[key]) {
-                    url.searchParams.set(key, paramObj[key]);
+        
+        // Render identity options
+        function renderIdentityOptions() {
+            identityOptions.innerHTML = '';
+            
+            // Add existing identities
+            identities.forEach(identity => {
+                const identityOption = document.createElement('div');
+                identityOption.className = 'identity-option';
+                identityOption.innerHTML = `
+                    <div class="option-title">
+                        <div class="identity-icon" style="color: ${identity.color}; border-color: ${identity.color};">
+                            ${identity.name.charAt(0)}
+                        </div>
+                        ${identity.name}
+                    </div>
+                    <div class="option-desc">选择此身份点餐</div>
+                `;
+                identityOption.addEventListener('click', function() {
+                    selectIdentity(identity);
+                });
+                identityOptions.appendChild(identityOption);
+            });
+            
+            // Add "Create new" option
+            const newOption = document.createElement('div');
+            newOption.className = 'identity-option new';
+            newOption.innerHTML = `
+                <div class="option-title">
+                    <div class="identity-icon" style="color: white; border-color: white;">
+                        ✚
+                    </div>
+                    创建新身份
+                </div>
+                <div class="option-desc">添加新的身份</div>
+            `;
+            newOption.addEventListener('click', function() {
+                toggleNewIdentityForm();
+            });
+            identityOptions.appendChild(newOption);
+        }
+        
+        // Toggle new identity form
+        function toggleNewIdentityForm() {
+            if (newIdentityForm.style.display === 'block') {
+                newIdentityForm.style.display = 'none';
+                newIdentityName.value = '';
+            } else {
+                newIdentityForm.style.display = 'block';
+                newIdentityName.focus();
+            }
+        }
+        
+        // Select identity
+        function selectIdentity(identity) {
+            currentUser = identity;
+            currentUserId = identity.id;
+            
+            console.log(`Identity selected: ${identity.name} (${identity.id})`);
+            
+            // Show shop selection modal
+            showShopModal();
+        }
+        
+        // Show shop selection modal
+        function showShopModal() {
+            renderShopOptions();
+            shopModal.style.display = 'flex';
+        }
+        
+        // Hide shop selection modal
+        function hideShopModal() {
+            shopModal.style.display = 'none';
+        }
+        
+        // Render shop options in modal
+        function renderShopOptions() {
+            shopOptions.innerHTML = '';
+            
+            shops.forEach(shop => {
+                const shopOption = document.createElement('div');
+                shopOption.className = 'shop-option';
+                shopOption.innerHTML = `
+                    <div class="option-title">
+                        <div class="shop-icon" style="background-color: ${shop.color}; color: white;">
+                            ${shop.name.charAt(0)}
+                        </div>
+                        ${shop.name}
+                    </div>
+                    <div class="option-desc">在 ${shop.name} 点餐</div>
+                `;
+                shopOption.addEventListener('click', function() {
+                    selectShop(shop);
+                    hideShopModal();
+                });
+                shopOptions.appendChild(shopOption);
+            });
+        }
+        
+        // Select shop
+        function selectShop(shop) {
+            currentShop = shop;
+            currentShopId = shop.id;
+            
+            console.log(`Shop selected: ${shop.name} (${shop.id}) for user ${currentUser.name}`);
+            showPage('homePage');
+            renderUserDisplay();
+            updateMealStatus();
+            loadHistory();
+        }
+        
+        // Render user display
+        function renderUserDisplay() {
+            if (!currentUser || !currentShop) return;
+            
+            // Update user displays
+            userIcon.textContent = currentUser.name.charAt(0);
+            userIcon.style.color = currentUser.color;
+            userIcon.style.borderColor = currentUser.color;
+            userNameDisplay.textContent = currentUser.name;
+            currentShopName.textContent = currentShop.name;
+            
+            orderUserIcon.textContent = currentUser.name.charAt(0);
+            orderUserIcon.style.color = currentUser.color;
+            orderUserIcon.style.borderColor = currentUser.color;
+            orderUserName.textContent = currentUser.name;
+            
+            managementUserIcon.textContent = currentUser.name.charAt(0);
+            managementUserIcon.style.color = currentUser.color;
+            managementUserIcon.style.borderColor = currentUser.color;
+            managementUserName.textContent = currentUser.name;
+        }
+        
+        // Update date and time
+        function updateDateTime() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('zh-CN', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                weekday: 'long'
+            });
+            
+            dateTimeDisplay.textContent = dateStr;
+            orderDateTime.textContent = `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日`;
+        }
+        
+        // Update meal status display (ordered or not)
+        function updateMealStatus() {
+            if (!currentUserId || !currentShopId) return;
+            
+            const orderKey = `${today}-${currentShopId}`;
+            const dailyOrders = orders[orderKey] || {};
+            
+            document.querySelectorAll('.meal-tab').forEach(tab => {
+                const mealType = tab.dataset.meal;
+                const statusElem = tab.querySelector('.meal-status');
+                
+                if (dailyOrders[mealType] && dailyOrders[mealType].foods && dailyOrders[mealType].foods.length > 0) {
+                    tab.classList.add('order-placed');
+                    statusElem.textContent = '已点餐';
                 } else {
-                    url.searchParams.delete(key);
+                    tab.classList.remove('order-placed');
+                    statusElem.textContent = '未点餐';
                 }
             });
-            window.history.replaceState({}, '', url);
         }
-        function loadOrderFromUrl() {
-            const orderParam = getUrlParameter('order');
-            if (orderParam) {
-                try {
-                    const decodedOrder = JSON.parse(decodeURIComponent(orderParam));
-                    currentOrder = decodedOrder;
-                } catch (e) {
-                    console.error('Failed to parse order from URL', e);
-                    currentOrder = [];
+        
+        // Load history for display
+        function loadHistory() {
+            if (!currentUserId || !currentShopId) return;
+            
+            // Get orders for this shop
+            const shopOrders = {};
+            Object.keys(orders).forEach(key => {
+                if (key.includes(`-${currentShopId}`)) {
+                    const date = key.split('-')[0];
+                    shopOrders[date] = orders[key];
                 }
+            });
+            
+            const historyKeys = Object.keys(shopOrders).sort((a, b) => new Date(b) - new Date(a)).slice(0, 7);
+            
+            if (historyKeys.length === 0) {
+                historyList.innerHTML = `
+                    <div class="empty-state">
+                        <div>📅</div>
+                        <p>暂无点餐历史<br>开始今天的点餐吧</p>
+                    </div>
+                `;
+                return;
             }
-        }
-        function updateUrlWithOrder() {
-            if (currentOrder.length > 0) {
-                const encodedOrder = encodeURIComponent(JSON.stringify(currentOrder));
-                setUrlParameter({order: encodedOrder});
-            } else {
-                setUrlParameter({order: ''});
-            }
-            updateShareUrl();
-        }
-        function updateShareUrl() {
-            const shareUrlInput = document.getElementById('shareUrl');
-            shareUrlInput.value = window.location.href;
-        }
-        function initMenu() {
-            renderFoodGrid(menuData);
-            setupCategoryFilters();
-            loadOrderFromUrl();
-            updateOrderDisplay();
-            updateShareUrl();
-        }
-        function renderFoodGrid(foods) {
-            const foodGrid = document.getElementById('foodGrid');
-            foodGrid.innerHTML = foods.map(food => `
-                <div class="food-card">
-                    <div class="food-image">${food.emoji}</div>
-                    <div class="food-info">
-                        <div class="food-name">${food.name}</div>
-                        <div class="food-desc">${food.description}</div>
-                        <div class="food-footer">
-                            <div class="food-price">${food.price}</div>
-                            <button class="add-to-cart" onclick="addToOrder(${food.id})">
-                                <span>+</span> 加入
-                            </button>
+            
+            let historyHTML = '';
+            
+            historyKeys.forEach(dateStr => {
+                const date = new Date(dateStr);
+                const dateDisplay = date.toLocaleDateString('zh-CN', {
+                    month: 'long',
+                    day: 'numeric',
+                    weekday: 'long'
+                });
+                
+                const dailyOrders = shopOrders[dateStr] || {};
+                
+                historyHTML += `
+                    <div class="history-item">
+                        <div class="history-date">${dateDisplay}</div>
+                        <div class="history-meals">
+                            <div class="history-meal">
+                                <div class="meal-type">早餐</div>
+                                <div class="meal-content ${!dailyOrders.breakfast || dailyOrders.breakfast.foods.length === 0 ? 'empty' : ''}">
+                                    ${dailyOrders.breakfast && dailyOrders.breakfast.foods.length > 0 ? 
+                                        dailyOrders.breakfast.foods.map(item => item.name).join(', ') : '未点餐'}
+                                </div>
+                                ${dailyOrders.breakfast && dailyOrders.breakfast.foods.length > 0 ? 
+                                    `<div class="orderer-info">
+                                        <div class="orderer-icon" style="color: ${getIdentityColor(dailyOrders.breakfast.userId)}; border-color: ${getIdentityColor(dailyOrders.breakfast.userId)};">
+                                            ${getIdentityInitial(dailyOrders.breakfast.userId)}
+                                        </div>
+                                        ${getIdentityName(dailyOrders.breakfast.userId)}
+                                    </div>` : ''}
+                            </div>
+                            <div class="history-meal">
+                                <div class="meal-type">午餐</div>
+                                <div class="meal-content ${!dailyOrders.lunch || dailyOrders.lunch.foods.length === 0 ? 'empty' : ''}">
+                                    ${dailyOrders.lunch && dailyOrders.lunch.foods.length > 0 ? 
+                                        dailyOrders.lunch.foods.map(item => item.name).join(', ') : '未点餐'}
+                                </div>
+                                ${dailyOrders.lunch && dailyOrders.lunch.foods.length > 0 ? 
+                                    `<div class="orderer-info">
+                                        <div class="orderer-icon" style="color: ${getIdentityColor(dailyOrders.lunch.userId)}; border-color: ${getIdentityColor(dailyOrders.lunch.userId)};">
+                                            ${getIdentityInitial(dailyOrders.lunch.userId)}
+                                        </div>
+                                        ${getIdentityName(dailyOrders.lunch.userId)}
+                                    </div>` : ''}
+                            </div>
+                            <div class="history-meal">
+                                <div class="meal-type">晚餐</div>
+                                <div class="meal-content ${!dailyOrders.dinner || dailyOrders.dinner.foods.length === 0 ? 'empty' : ''}">
+                                    ${dailyOrders.dinner && dailyOrders.dinner.foods.length > 0 ? 
+                                        dailyOrders.dinner.foods.map(item => item.name).join(', ') : '未点餐'}
+                                </div>
+                                ${dailyOrders.dinner && dailyOrders.dinner.foods.length > 0 ? 
+                                    `<div class="orderer-info">
+                                        <div class="orderer-icon" style="color: ${getIdentityColor(dailyOrders.dinner.userId)}; border-color: ${getIdentityColor(dailyOrders.dinner.userId)};">
+                                            ${getIdentityInitial(dailyOrders.dinner.userId)}
+                                        </div>
+                                        ${getIdentityName(dailyOrders.dinner.userId)}
+                                    </div>` : ''}
+                            </div>
+                            <div class="history-meal">
+                                <div class="meal-type">夜宵</div>
+                                <div class="meal-content ${!dailyOrders.night || dailyOrders.night.foods.length === 0 ? 'empty' : ''}">
+                                    ${dailyOrders.night && dailyOrders.night.foods.length > 0 ? 
+                                        dailyOrders.night.foods.map(item => item.name).join(', ') : '未点餐'}
+                                </div>
+                                ${dailyOrders.night && dailyOrders.night.foods.length > 0 ? 
+                                    `<div class="orderer-info">
+                                        <div class="orderer-icon" style="color: ${getIdentityColor(dailyOrders.night.userId)}; border-color: ${getIdentityColor(dailyOrders.night.userId)};">
+                                            ${getIdentityInitial(dailyOrders.night.userId)}
+                                        </div>
+                                        ${getIdentityName(dailyOrders.night.userId)}
+                                    </div>` : ''}
+                            </div>
                         </div>
                     </div>
-                </div>
-            `).join('');
+                `;
+            });
+            
+            historyList.innerHTML = historyHTML;
         }
-        function setupCategoryFilters() {
-            const categoryBtns = document.querySelectorAll('.category-btn');
-            categoryBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    categoryBtns.forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    const category = this.textContent;
-                    if (category === '全部') {
-                        renderFoodGrid(menuData);
-                    } else {
-                        const filteredFoods = menuData.filter(food => food.category === category);
-                        renderFoodGrid(filteredFoods);
-                    }
+        
+        // Helper functions for identity data
+        function getIdentityColor(identityId) {
+            const identity = identities.find(i => i.id === identityId);
+            return identity ? identity.color : '#4facfe';
+        }
+        
+        function getIdentityInitial(identityId) {
+            const identity = identities.find(i => i.id === identityId);
+            return identity ? identity.name.charAt(0) : '?';
+        }
+        
+        function getIdentityName(identityId) {
+            const identity = identities.find(i => i.id === identityId);
+            return identity ? identity.name : '未知';
+        }
+        
+        // Show order page for selected meal
+        function showOrderPage() {
+            if (!currentUser || !currentShop) {
+                console.error('Cannot show order page without identity and shop');
+                showPage('identityPage');
+                return;
+            }
+            
+            showPage('orderPage');
+            
+            // Update title based on meal type
+            const mealTitles = {
+                'breakfast': '🌅 早餐',
+                'lunch': '☀️ 午餐',
+                'dinner': '🌇 晚餐',
+                'night': '🌙 夜宵'
+            };
+            
+            currentMealTitle.textContent = mealTitles[currentMealType];
+            renderUserDisplay();
+            
+            // Load existing selections if any
+            const orderKey = `${today}-${currentShopId}`;
+            const dailyOrders = orders[orderKey] || {};
+            const currentOrder = dailyOrders[currentMealType] || {};
+            
+            // Only load selections if this user is the one who placed the order
+            if (currentOrder.userId === currentUserId) {
+                selectedFoods = currentOrder.foods || [];
+            } else {
+                selectedFoods = [];
+            }
+            
+            // Render categories and foods
+            renderCategories();
+            updateSelectedItemsDisplay();
+        }
+        
+        // Render categories
+        function renderCategories() {
+            if (!currentShopId) return;
+            
+            const shopCategories = categories[currentShopId] || [];
+            const shopFoods = foods[currentShopId] || [];
+            
+            // Sort categories by order
+            shopCategories.sort((a, b) => a.order - b.order);
+            
+            // Filter categories that have at least one food
+            const categoriesWithFoods = shopCategories.filter(category => 
+                shopFoods.some(food => food.categoryId === category.id)
+            );
+            
+            if (categoriesWithFoods.length === 0) {
+                categoriesContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div>🏷️</div>
+                        <p>暂无菜品分类<br>请先创建分类和菜品</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            categoriesWithFoods.forEach(category => {
+                const categoryFoods = shopFoods.filter(food => food.categoryId === category.id);
+                if (categoryFoods.length > 0) {
+                    html += `
+                        <div class="category-header">
+                            <div class="category-title">
+                                <span>🏷️</span> ${category.name}
+                            </div>
+                        </div>
+                        <div class="food-grid" data-category-id="${category.id}">
+                            ${categoryFoods.map(food => {
+                                const isSelected = selectedFoods.some(item => item.id === food.id);
+                                return `
+                                    <div class="food-card ${isSelected ? 'selected' : ''}" data-id="${food.id}">
+                                        <div class="food-emoji">${food.emoji}</div>
+                                        <div class="food-name">${food.name}</div>
+                                        <div class="food-price">${food.price}积分</div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    `;
+                }
+            });
+            
+            categoriesContainer.innerHTML = html;
+            
+            // Add click listeners to food cards
+            document.querySelectorAll('.food-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const foodId = this.dataset.id;
+                    toggleFoodSelection(foodId);
                 });
             });
         }
-        function addToOrder(foodId) {
-            const food = menuData.find(item => item.id === foodId);
+        
+        // Toggle food selection
+        function toggleFoodSelection(foodId) {
+            if (!currentShopId) return;
+            
+            const shopFoods = foods[currentShopId] || [];
+            const food = shopFoods.find(item => item.id === foodId);
             if (!food) return;
-            const existingItem = currentOrder.find(item => item.id === foodId);
-            if (existingItem) {
-                existingItem.quantity += 1;
+            
+            const index = selectedFoods.findIndex(item => item.id === foodId);
+            
+            if (index === -1) {
+                // Add to selection
+                selectedFoods.push({
+                    id: food.id,
+                    name: food.name,
+                    price: food.price,
+                    emoji: food.emoji
+                });
+                showNotification(`${food.name} 已加入`);
             } else {
-                currentOrder.push({ id: food.id, name: food.name, price: food.price, quantity: 1 });
+                // Remove from selection
+                selectedFoods.splice(index, 1);
+                showNotification(`${food.name} 已移除`);
             }
-            updateOrderDisplay();
-            updateUrlWithOrder();
+            
+            updateSelectedItemsDisplay();
+            renderCategories(); // Refresh to update selected state
         }
-        function updateOrderQuantity(foodId, change) {
-            const itemIndex = currentOrder.findIndex(item => item.id === foodId);
-            if (itemIndex === -1) return;
-            if (change === -1) {
-                if (currentOrder[itemIndex].quantity > 1) {
-                    currentOrder[itemIndex].quantity += change;
-                } else {
-                    currentOrder.splice(itemIndex, 1);
-                }
-            } else {
-                currentOrder[itemIndex].quantity += change;
-            }
-            updateOrderDisplay();
-            updateUrlWithOrder();
-        }
-        function updateOrderDisplay() {
-            const orderItems = document.getElementById('orderItems');
-            const totalAmount = document.getElementById('totalAmount');
-            const clearBtn = document.getElementById('clearBtn');
-            if (currentOrder.length === 0) {
-                orderItems.innerHTML = `<div class="empty-state"><div>🛒</div><p>购物车为空<br>选择菜品开始点餐</p></div>`;
-                totalAmount.textContent = '0积分';
-                clearBtn.style.display = 'none';
+        
+        // Update selected items display
+        function updateSelectedItemsDisplay() {
+            if (selectedFoods.length === 0) {
+                selectedItems.innerHTML = `
+                    <div class="empty-state" style="padding: 20px; margin: 0;">
+                        <div>🛒</div>
+                        <p>暂未选择菜品<br>点击上方菜品添加</p>
+                    </div>
+                `;
+                submitOrderBtn.disabled = true;
                 return;
             }
-            orderItems.innerHTML = currentOrder.map(item => `
-                <div class="order-item">
-                    <div class="item-info">
-                        <div class="item-name">${item.name}</div>
-                        <div class="item-price">${item.price}</div>
-                    </div>
-                    <div class="item-controls">
-                        <button class="control-btn minus" onclick="updateOrderQuantity(${item.id}, -1)">-</button>
-                        <span class="quantity-display">${item.quantity}</span>
-                        <button class="control-btn" onclick="updateOrderQuantity(${item.id}, 1)">+</button>
-                    </div>
+            
+            selectedItems.innerHTML = selectedFoods.map(food => `
+                <div class="selected-item" data-id="${food.id}">
+                    ${food.emoji} ${food.name} (${food.price}积分)
+                    <span class="remove-item">×</span>
                 </div>
             `).join('');
-            const priceCounts = {};
-            currentOrder.forEach(item => {
-                priceCounts[item.price] = (priceCounts[item.price] || 0) + item.quantity;
+            
+            // Add event listeners to remove buttons
+            document.querySelectorAll('.remove-item').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const item = this.closest('.selected-item');
+                    const foodId = item.dataset.id;
+                    toggleFoodSelection(foodId);
+                });
             });
-            const priceEntries = Object.entries(priceCounts);
-            if (priceEntries.length === 1) {
-                totalAmount.textContent = `${priceEntries[0][1]}${priceEntries[0][0]}`;
-            } else {
-                const totalText = priceEntries.map(([price, count]) => `${count}${price}`).join(' + ');
-                totalAmount.textContent = totalText.length > 20 ? totalText.substring(0, 20) + '...' : totalText;
-            }
-            clearBtn.style.display = 'block';
+            
+            submitOrderBtn.disabled = false;
         }
-        function clearOrder() {
-            if (currentOrder.length === 0) return;
-            if (confirm('确定要清空所有订单吗？')) {
-                currentOrder = [];
-                updateOrderDisplay();
-                updateUrlWithOrder();
-            }
-        }
+        
+        // Submit order
         function submitOrder() {
-            if (currentOrder.length === 0) {
-                alert('请先选择菜品！');
+            if (selectedFoods.length === 0) {
+                showNotification('请至少选择一种食物', 'error');
                 return;
             }
-            const orderSummary = currentOrder.map(item => 
-                `${item.name} x${item.quantity} (${item.price})`
-            ).join('\n');
-            alert(`订单已提交！\n\n您的订单：\n${orderSummary}\n\n总计：${document.getElementById('totalAmount').textContent}\n\n请将上方的分享链接发送给家人查看订单！`);
+            
+            if (!currentUserId || !currentShopId) {
+                showNotification('请先选择身份和店铺', 'error');
+                return;
+            }
+            
+            // Check if this is a new order or modification
+            const orderKey = `${today}-${currentShopId}`;
+            const dailyOrders = orders[orderKey] || {};
+            const existingOrder = dailyOrders[currentMealType];
+            const isModification = existingOrder && existingOrder.userId === currentUserId;
+            
+            // Save to local storage for current user and shop
+            dailyOrders[currentMealType] = {
+                userId: currentUserId,
+                foods: selectedFoods
+            };
+            orders[orderKey] = dailyOrders;
+            saveOrders();
+            
+            // Send notifications to bound users
+            sendOrderNotifications(currentMealType, selectedFoods, isModification);
+            
+            // Update UI
+            const actionText = isModification ? '修改' : '点餐';
+            showNotification(`✅ ${currentMealTitle.textContent}${actionText}成功！`);
+            
+            // Return to home page after delay
+            setTimeout(() => {
+                showPage('homePage');
+                updateMealStatus();
+                loadHistory();
+            }, 1500);
         }
-        function copyShareUrl() {
-            const shareUrlInput = document.getElementById('shareUrl');
-            shareUrlInput.select();
-            try {
-                document.execCommand('copy');
-                alert('链接已复制！现在可以发送给家人了。');
-            } catch (err) {
-                alert('复制失败，请手动复制链接。');
+        
+        // Send notifications to users bound to this shop
+        function sendOrderNotifications(mealType, foods, isModification = false) {
+            if (!currentShopId || !currentUser) return;
+            
+            // Find all users bound to this shop
+            Object.keys(bindings).forEach(identityId => {
+                // Skip current user
+                if (identityId === currentUserId) return;
+                
+                // Check if this identity is bound to current shop
+                if (bindings[identityId].includes(currentShopId)) {
+                    const actionText = isModification ? '修改了' : '点了';
+                    const foodNames = foods.map(food => food.name).join(', ');
+                    const message = `${currentUser.name} 在 ${currentShop.name} ${actionText} ${mealType}: ${foodNames}`;
+                    
+                    // In a real app, this would send a push notification
+                    // For this demo, we'll just log it and show a notification
+                    console.log(`发送通知给 ${getIdentityName(identityId)}: ${message}`);
+                    
+                    // Show a notification in the app
+                    showNotification(`🔔 ${getIdentityName(identityId)} 收到通知: ${message}`);
+                }
+            });
+        }
+        
+        // Create new identity
+        function createIdentity() {
+            const name = newIdentityName.value.trim();
+            if (!name) {
+                showNotification('身份名称不能为空', 'error');
+                return;
+            }
+            
+            // Check if identity already exists
+            if (identities.some(i => i.name.toLowerCase() === name.toLowerCase())) {
+                showNotification('该身份已存在', 'error');
+                return;
+            }
+            
+            // Create new identity
+            const newIdentity = {
+                id: generateId(),
+                name: name,
+                color: getRandomColor()
+            };
+            
+            identities.push(newIdentity);
+            bindings[newIdentity.id] = []; // Initialize empty bindings
+            saveIdentities();
+            saveBindings();
+            
+            // Reset form
+            newIdentityName.value = '';
+            newIdentityForm.style.display = 'none';
+            
+            // Select the new identity
+            selectIdentity(newIdentity);
+            
+            showNotification(`身份 "${name}" 创建成功！`);
+        }
+        
+        // Create new shop
+        function createShop() {
+            const name = newShopName.value.trim();
+            if (!name) {
+                showNotification('店铺名称不能为空', 'error');
+                return;
+            }
+            
+            // Check if shop already exists
+            if (shops.some(s => s.name.toLowerCase() === name.toLowerCase())) {
+                showNotification('该店铺已存在', 'error');
+                return;
+            }
+            
+            // Create new shop
+            const newShop = {
+                id: generateId(),
+                name: name,
+                color: getRandomColor()
+            };
+            
+            shops.push(newShop);
+            saveShops();
+            
+            // Initialize categories and foods for this shop
+            categories[newShop.id] = [
+                { id: generateId(), name: '大荤', order: 1 },
+                { id: generateId(), name: '小荤', order: 2 },
+                { id: generateId(), name: '素菜', order: 3 },
+                { id: generateId(), name: '汤类', order: 4 },
+                { id: generateId(), name: '甜品', order: 5 },
+                { id: generateId(), name: '小吃', order: 6 },
+                { id: generateId(), name: '饮料', order: 7 }
+            ];
+            
+            const shopCategories = categories[newShop.id];
+            foods[newShop.id] = [
+                { id: generateId(), name: '红烧肉', categoryId: shopCategories[0].id, emoji: '🍖', price: 28 },
+                { id: generateId(), name: '清蒸鱼', categoryId: shopCategories[0].id, emoji: '🐟', price: 32 },
+                { id: generateId(), name: '宫保鸡丁', categoryId: shopCategories[1].id, emoji: '🍗', price: 25 },
+                { id: generateId(), name: '西红柿炒蛋', categoryId: shopCategories[2].id, emoji: '🍳', price: 18 },
+                { id: generateId(), name: '青菜', categoryId: shopCategories[2].id, emoji: '🥬', price: 12 },
+                { id: generateId(), name: '紫菜蛋花汤', categoryId: shopCategories[3].id, emoji: '🍲', price: 10 },
+                { id: generateId(), name: '冰淇淋', categoryId: shopCategories[4].id, emoji: '🍦', price: 15 },
+                { id: generateId(), name: '水果拼盘', categoryId: shopCategories[4].id, emoji: '🍓', price: 22 },
+                { id: generateId(), name: '春卷', categoryId: shopCategories[5].id, emoji: '🥠', price: 16 },
+                { id: generateId(), name: '可乐', categoryId: shopCategories[6].id, emoji: '🥤', price: 8 },
+                { id: generateId(), name: '豆浆', categoryId: shopCategories[6].id, emoji: '🥛', price: 6 }
+            ];
+            
+            saveCategories();
+            saveFoods();
+            
+            // Close modal and reset
+            createShopModal.style.display = 'none';
+            newShopName.value = '';
+            
+            // Re-render shop options
+            renderShopOptions();
+            
+            showNotification(`店铺 "${name}" 创建成功！`);
+        }
+        
+        // Show a specific page and update navigation
+        function showPage(pageId) {
+            console.log(`Showing page: ${pageId}, current identity: ${currentUser ? currentUser.name : 'none'}`);
+            
+            // Hide all pages
+            [identityPage, homePage, orderPage, managementPage].forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show the target page
+            document.getElementById(pageId).classList.add('active');
+            currentPage = pageId;
+            
+            // Handle navigation and UI state based on page
+            if (pageId === 'identityPage') {
+                // Identity page - hide navigation
+                globalNav.style.display = 'none';
+                backBtnGlobal.style.display = 'none';
+            } else {
+                // Other pages - show navigation and back buttons
+                globalNav.style.display = 'flex';
+                backBtnGlobal.style.display = 'flex';
+                
+                if (pageId === 'homePage') {
+                    backBtnGlobal.textContent = '👤';
+                    backBtnGlobal.onclick = function() {
+                        showPage('identityPage');
+                    };
+                } else if (pageId === 'orderPage') {
+                    backBtnGlobal.textContent = '←';
+                    backBtnGlobal.onclick = function() {
+                        showPage('homePage');
+                    };
+                } else if (pageId === 'managementPage') {
+                    backBtnGlobal.textContent = '←';
+                    backBtnGlobal.onclick = function() {
+                        showPage('homePage');
+                    };
+                    renderManagementPage();
+                }
+            }
+            
+            // Update navigation UI
+            updateNavigationUI();
+        }
+        
+        // Update navigation UI based on current page
+        function updateNavigationUI() {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.toggle('active', item.dataset.page === currentPage);
+            });
+            
+            // Show/hide order tab based on context
+            orderNavTab.style.display = currentPage === 'orderPage' ? 'flex' : 'none';
+        }
+        
+        // Render management page
+        function renderManagementPage() {
+            if (!currentUser) return;
+            
+            // Render identities
+            identityManagementList.innerHTML = '';
+            identities.forEach(identity => {
+                const identityItem = document.createElement('div');
+                identityItem.className = 'management-item';
+                identityItem.innerHTML = `
+                    <div class="item-info">
+                        <div class="item-icon" style="background-color: ${identity.color};">
+                            ${identity.name.charAt(0)}
+                        </div>
+                        <div class="item-details">
+                            <div class="item-name">${identity.name}</div>
+                            <div class="item-meta">${identity.id}</div>
+                        </div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="action-btn edit-btn" data-id="${identity.id}" data-type="identity">编辑</button>
+                        <button class="action-btn delete-btn" data-id="${identity.id}" data-type="identity">删除</button>
+                    </div>
+                `;
+                identityManagementList.appendChild(identityItem);
+            });
+            
+            // Render shops
+            shopManagementList.innerHTML = '';
+            shops.forEach(shop => {
+                const shopItem = document.createElement('div');
+                shopItem.className = 'management-item';
+                shopItem.innerHTML = `
+                    <div class="item-info">
+                        <div class="item-icon" style="background-color: ${shop.color};">
+                            ${shop.name.charAt(0)}
+                        </div>
+                        <div class="item-details">
+                            <div class="item-name">${shop.name}</div>
+                            <div class="item-meta">${shop.id}</div>
+                        </div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="action-btn edit-btn" data-id="${shop.id}" data-type="shop">编辑</button>
+                        <button class="action-btn delete-btn" data-id="${shop.id}" data-type="shop">删除</button>
+                    </div>
+                `;
+                shopManagementList.appendChild(shopItem);
+            });
+            
+            // Render foods
+            foodManagementList.innerHTML = '';
+            if (currentShopId) {
+                const shopFoods = foods[currentShopId] || [];
+                shopFoods.forEach(food => {
+                    const foodItem = document.createElement('div');
+                    foodItem.className = 'management-item';
+                    foodItem.innerHTML = `
+                        <div class="item-info">
+                            <div class="item-icon">
+                                ${food.emoji}
+                            </div>
+                            <div class="item-details">
+                                <div class="item-name">${food.name}</div>
+                                <div class="item-meta">${food.price}积分</div>
+                            </div>
+                        </div>
+                        <div class="item-actions">
+                            <button class="action-btn edit-btn" data-id="${food.id}" data-type="food">编辑</button>
+                            <button class="action-btn delete-btn" data-id="${food.id}" data-type="food">删除</button>
+                        </div>
+                    `;
+                    foodManagementList.appendChild(foodItem);
+                });
+            }
+            
+            // Render bindings summary
+            bindingManagementList.innerHTML = '';
+            const boundShopsCount = bindings[currentUserId] ? bindings[currentUserId].length : 0;
+            const bindingItem = document.createElement('div');
+            bindingItem.className = 'management-item';
+            bindingItem.innerHTML = `
+                <div class="item-info">
+                    <div class="item-icon" style="background-color: var(--success);">
+                        🔔
+                    </div>
+                    <div class="item-details">
+                        <div class="item-name">店铺绑定</div>
+                        <div class="item-meta">已绑定 ${boundShopsCount} 个店铺</div>
+                    </div>
+                </div>
+                <div class="item-actions">
+                    <button class="action-btn bind-btn" id="manageBindingsBtnInList">管理</button>
+                </div>
+            `;
+            bindingManagementList.appendChild(bindingItem);
+            
+            // Add event listeners to management buttons
+            addManagementEventListeners();
+        }
+        
+        // Add event listeners to management buttons
+        function addManagementEventListeners() {
+            // Edit buttons
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    const type = this.dataset.type;
+                    showEditModal(type, id);
+                });
+            });
+            
+            // Delete buttons
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    const type = this.dataset.type;
+                    deleteItem(type, id);
+                });
+            });
+            
+            // Bindings management button
+            const manageBindingsBtnInList = document.getElementById('manageBindingsBtnInList');
+            if (manageBindingsBtnInList) {
+                manageBindingsBtnInList.addEventListener('click', showBindingModal);
             }
         }
-        document.addEventListener('DOMContentLoaded', initMenu);
+        
+        // Show edit modal for items
+        function showEditModal(type, id) {
+            // For demo purposes, we'll just show a notification
+            showNotification(`${type}编辑功能将在后续版本中完善`);
+        }
+        
+        // Delete item from management
+        function deleteItem(type, id) {
+            let itemName = '';
+            
+            if (type === 'identity') {
+                const identity = identities.find(i => i.id === id);
+                if (!identity) return;
+                
+                itemName = identity.name;
+                
+                if (confirm(`确定要删除身份 "${itemName}" 吗？此操作无法撤销！`)) {
+                    // Remove from identities
+                    identities = identities.filter(i => i.id !== id);
+                    saveIdentities();
+                    
+                    // Remove from bindings
+                    delete bindings[id];
+                    saveBindings();
+                    
+                    showNotification(`身份 "${itemName}" 已删除`);
+                    renderManagementPage();
+                }
+            } else if (type === 'shop') {
+                const shop = shops.find(s => s.id === id);
+                if (!shop) return;
+                
+                itemName = shop.name;
+                
+                if (confirm(`确定要删除店铺 "${itemName}" 吗？此操作将删除所有相关数据和绑定，无法撤销！`)) {
+                    // Remove from shops
+                    shops = shops.filter(s => s.id !== id);
+                    saveShops();
+                    
+                    // Remove from categories and foods
+                    delete categories[id];
+                    delete foods[id];
+                    saveCategories();
+                    saveFoods();
+                    
+                    // Remove from bindings for all identities
+                    Object.keys(bindings).forEach(identityId => {
+                        bindings[identityId] = bindings[identityId].filter(shopId => shopId !== id);
+                    });
+                    saveBindings();
+                    
+                    // If current shop is deleted, go to shop selection
+                    if (currentShopId === id) {
+                        currentShopId = null;
+                        currentShop = null;
+                        showShopModal();
+                    }
+                    
+                    showNotification(`店铺 "${itemName}" 已删除`);
+                    renderManagementPage();
+                }
+            } else if (type === 'food') {
+                // Find the food item
+                let foodItem = null;
+                let shopId = null;
+                
+                for (const [sId, shopFoods] of Object.entries(foods)) {
+                    foodItem = shopFoods.find(f => f.id === id);
+                    if (foodItem) {
+                        shopId = sId;
+                        break;
+                    }
+                }
+                
+                if (!foodItem) return;
+                
+                itemName = foodItem.name;
+                
+                if (confirm(`确定要删除菜品 "${itemName}" 吗？`)) {
+                    // Remove from foods
+                    foods[shopId] = foods[shopId].filter(f => f.id !== id);
+                    saveFoods();
+                    
+                    showNotification(`菜品 "${itemName}" 已删除`);
+                    renderManagementPage();
+                }
+            }
+        }
+        
+        // Show binding modal
+        function showBindingModal() {
+            bindingList.innerHTML = '';
+            
+            shops.forEach(shop => {
+                const isBound = bindings[currentUserId] ? bindings[currentUserId].includes(shop.id) : false;
+                
+                const bindingItem = document.createElement('div');
+                bindingItem.className = 'binding-item';
+                bindingItem.innerHTML = `
+                    <div class="binding-info">
+                        <div class="binding-checkbox ${isBound ? 'checked' : ''}" data-shop-id="${shop.id}">
+                            ${isBound ? '✓' : ''}
+                        </div>
+                        <div class="shop-icon" style="background-color: ${shop.color};">
+                            ${shop.name.charAt(0)}
+                        </div>
+                        <div>${shop.name}</div>
+                    </div>
+                    <div class="binding-status">
+                        ${isBound ? '已绑定' : '未绑定'}
+                    </div>
+                `;
+                bindingList.appendChild(bindingItem);
+            });
+            
+            // Add click listeners to checkboxes
+            document.querySelectorAll('.binding-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('click', function() {
+                    this.classList.toggle('checked');
+                    this.innerHTML = this.classList.contains('checked') ? '✓' : '';
+                    
+                    // Update status text
+                    const statusElem = this.closest('.binding-item').querySelector('.binding-status');
+                    statusElem.textContent = this.classList.contains('checked') ? '已绑定' : '未绑定';
+                });
+            });
+            
+            bindingModal.style.display = 'flex';
+        }
+        
+        // Save binding settings
+        function saveBindingSettings() {
+            if (!currentUserId) return;
+            
+            const selectedShopIds = [];
+            document.querySelectorAll('.binding-checkbox.checked').forEach(checkbox => {
+                selectedShopIds.push(checkbox.dataset.shopId);
+            });
+            
+            bindings[currentUserId] = selectedShopIds;
+            saveBindings();
+            
+            bindingModal.style.display = 'none';
+            showNotification(`绑定设置已保存！已绑定 ${selectedShopIds.length} 个店铺`);
+            
+            // Update management page
+            renderManagementPage();
+        }
+        
+        // Setup event listeners
+        function setupEventListeners() {
+            console.log('Setting up event listeners...');
+            
+            // Identity page events
+            createIdentityBtn.addEventListener('click', createIdentity);
+            cancelNewIdentityBtn.addEventListener('click', function() {
+                newIdentityForm.style.display = 'none';
+                newIdentityName.value = '';
+            });
+            
+            // Shop modal events
+            cancelShopBtn.addEventListener('click', hideShopModal);
+            createShopBtn.addEventListener('click', function() {
+                hideShopModal();
+                createShopModal.style.display = 'flex';
+            });
+            
+            // Create shop modal events
+            cancelCreateShopBtn.addEventListener('click', function() {
+                createShopModal.style.display = 'none';
+                newShopName.value = '';
+            });
+            
+            confirmCreateShopBtn.addEventListener('click', createShop);
+            
+            // Change shop button
+            changeShopBtn.addEventListener('click', function() {
+                showShopModal();
+            });
+            
+            // Meal tab clicks
+            mealTabs.addEventListener('click', function(e) {
+                const tab = e.target.closest('.meal-tab');
+                if (tab) {
+                    currentMealType = tab.dataset.meal;
+                    showOrderPage();
+                }
+            });
+            
+            // Food selection events
+            clearSelectionBtn.addEventListener('click', function() {
+                if (selectedFoods.length > 0 && confirm('确定要清空所有选择吗？')) {
+                    selectedFoods = [];
+                    updateSelectedItemsDisplay();
+                    renderCategories(); // Refresh food display
+                    showNotification('已清空所有选择');
+                }
+            });
+            
+            submitOrderBtn.addEventListener('click', submitOrder);
+            
+            // Navigation events
+            backBtnGlobalOrder.addEventListener('click', function() {
+                showPage('homePage');
+                updateMealStatus();
+                loadHistory();
+            });
+            
+            backBtnGlobalManagement.addEventListener('click', function() {
+                showPage('homePage');
+            });
+            
+            // Global navigation
+            globalNav.addEventListener('click', function(e) {
+                const navItem = e.target.closest('.nav-item');
+                if (navItem) {
+                    const page = navItem.dataset.page;
+                    if (page === 'orderPage' && !currentMealType) {
+                        showNotification('请先选择一个餐食');
+                        return;
+                    }
+                    showPage(page);
+                }
+            });
+            
+            // Reset data
+            resetAllDataBtn.addEventListener('click', function() {
+                if (confirm('确定要重置所有数据吗？这将删除所有身份、店铺和点餐记录，且无法恢复！')) {
+                    localStorage.clear();
+                    location.reload(); // Reload the page to reset everything
+                }
+            });
+            
+            // Management page buttons
+            addIdentityBtn.addEventListener('click', function() {
+                toggleNewIdentityForm();
+                showPage('identityPage');
+            });
+            
+            addShopBtn.addEventListener('click', function() {
+                createShopModal.style.display = 'flex';
+            });
+            
+            addFoodBtn.addEventListener('click', function() {
+                showNotification('添加菜品功能将在后续版本中完善');
+            });
+            
+            manageBindingsBtn.addEventListener('click', showBindingModal);
+            
+            // Binding modal events
+            cancelBindingBtn.addEventListener('click', function() {
+                bindingModal.style.display = 'none';
+            });
+            
+            saveBindingBtn.addEventListener('click', saveBindingSettings);
+            
+            exportDataBtn.addEventListener('click', function() {
+                showNotification('导出数据功能将在后续版本中完善');
+            });
+            
+            importDataBtn.addEventListener('click', function() {
+                showNotification('导入数据功能将在后续版本中完善');
+            });
+        }
+        
+        // Generate unique ID
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+        
+        // Get random color for new identities/shops
+        function getRandomColor() {
+            const colors = ['#4facfe', '#ff6b6b', '#43e97b', '#f9d423', '#ff9a9e', '#a18cd1', '#fad0c4'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+        
+        // Save data to localStorage
+        function saveIdentities() {
+            localStorage.setItem('identities', JSON.stringify(identities));
+        }
+        
+        function saveShops() {
+            localStorage.setItem('shops', JSON.stringify(shops));
+        }
+        
+        function saveCategories() {
+            localStorage.setItem('categories', JSON.stringify(categories));
+        }
+        
+        function saveFoods() {
+            localStorage.setItem('foods', JSON.stringify(foods));
+        }
+        
+        function saveOrders() {
+            localStorage.setItem('orders', JSON.stringify(orders));
+        }
+        
+        function saveBindings() {
+            localStorage.setItem('bindings', JSON.stringify(bindings));
+        }
+        
+        // Show in-app notification
+        function showNotification(message, type = 'info') {
+            notification.textContent = message;
+            notification.className = 'notification';
+            
+            if (type === 'success') {
+                notification.style.background = 'linear-gradient(135deg, #4caf50, #43a047)';
+            } else if (type === 'error') {
+                notification.style.background = 'linear-gradient(135deg, #ff6b6b, #ee5a24)';
+            } else {
+                notification.style.background = 'linear-gradient(135deg, var(--primary), var(--secondary))';
+            }
+            
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing application...');
+            initApp();
+        });
     </script>
 </body>
 </html>

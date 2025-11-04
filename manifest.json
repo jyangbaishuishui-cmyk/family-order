@@ -1,6 +1,6 @@
 {
   "name": "家庭点餐平台",
-  "short_name": "我吃吃吃吃",
+  "short_name": "家庭点餐",
   "description": "家人们可以点餐，订单会生成分享链接",
   "start_url": "/family-order/",
   "scope": "/family-order/",

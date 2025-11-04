@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>家庭点餐平台</title>
+
+    <!-- PWA: Web App Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- PWA: 主屏幕图标（Safari 兼容） -->
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <meta name="apple-mobile-web-app-title" content="家庭点餐">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- PWA: Theme color for address bar -->
+    <meta name="theme-color" content="#4facfe">
+
+    <style>
+        /* ——— 你的原有 CSS ——— */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            text-align: center;
+            position: relative;
+        }
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+        .share-section {
+            background: rgba(255,255,255,0.2);
+            padding: 12px;
+            border-radius: 12px;
+            margin-top: 12px;
+            display: flex;
+            gap: 10px;
+        }
+        .share-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .copy-btn {
+            background: white;
+            color: #4facfe;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .main-content {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+        .menu-section {
+            flex: 3;
+            min-width: 300px;
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .order-section {
+            flex: 2;
+            min-width: 280px;
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 20px;
+            height: fit-content;
+        }
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #333;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .categories {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .category-btn {
+            padding: 10px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 20px;
+            background: white;
+            color: #666;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        .category-btn.active,
+        .category-btn:hover {
+            border-color: #4facfe;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+        .food-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+        }
+        .food-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border: 2px solid #f8f9fa;
+        }
+        .food-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            border-color: #4facfe;
+        }
+        .food-image {
+            width: 100%;
+            height: 160px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+        }
+        .food-info {
+            padding: 16px;
+        }
+        .food-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        .food-desc {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 12px;
+            min-height: 40px;
+        }
+        .food-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .food-price {
+            font-size: 20px;
+            font-weight: 700;
+            color: #4facfe;
+        }
+        .add-to-cart {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .add-to-cart:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(79, 172, 254, 0.4);
+        }
+        .order-items {
+            margin-bottom: 24px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .order-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            border-left: 4px solid #4facfe;
+        }
+        .item-info {
+            flex: 1;
+            margin-right: 12px;
+        }
+        .item-name {
+            font-weight: 600;
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        .item-price {
+            font-size: 14px;
+            color: #4facfe;
+            font-weight: 500;
+        }
+        .item-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .control-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: none;
+            background: #4facfe;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        .control-btn.minus {
+            background: #6c757d;
+        }
+        .control-btn:hover {
+            transform: scale(1.1);
+        }
+        .quantity-display {
+            min-width: 24px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        .total-section {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .total-label {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        .total-amount {
+            font-size: 24px;
+            font-weight: 700;
+            color: #4facfe;
+            background: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            display: inline-block;
+            min-width: 120px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .checkout-btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .checkout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(79, 172, 254, 0.3);
+        }
+        .checkout-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: #e9ecef;
+            display: block;
+        }
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .clear-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .clear-btn:hover {
+            background: #ee5a24;
+        }
+        .scrollbar {
+            scrollbar-width: thin;
+            scrollbar-color: #4facfe #f0f0f0;
+        }
+        .scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .scrollbar::-webkit-scrollbar-track {
+            background: #f0f0f0;
+            border-radius: 3px;
+        }
+        .scrollbar::-webkit-scrollbar-thumb {
+            background: #4facfe;
+            border-radius: 3px;
+        }
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            .order-section {
+                position: static;
+            }
+            .food-grid {
+                grid-template-columns: 1fr;
+            }
+            .share-section {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍽️ 家庭点餐平台</h1>
+            <p>家人们可以点餐，订单会生成分享链接</p>
+            <div class="share-section">
+                <input type="text" id="shareUrl" class="share-input" placeholder="订单分享链接（复制后发送给家人）" readonly>
+                <button class="copy-btn" onclick="copyShareUrl()">复制链接</button>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="menu-section">
+                <h2 class="section-title">📋 菜单</h2>
+                <div class="categories">
+                    <button class="category-btn active">全部</button>
+                    <button class="category-btn">主食</button>
+                    <button class="category-btn">饮品</button>
+                    <button class="category-btn">甜点</button>
+                    <button class="category-btn">小食</button>
+                </div>
+                <div class="food-grid" id="foodGrid"></div>
+            </div>
+            
+            <div class="order-section">
+                <div class="order-header">
+                    <h2 class="section-title">🛒 我的订单</h2>
+                    <button class="clear-btn" onclick="clearOrder()" id="clearBtn">清空</button>
+                </div>
+                <div class="order-items scrollbar" id="orderItems">
+                    <div class="empty-state">
+                        <div>🛒</div>
+                        <p>购物车为空<br>选择菜品开始点餐</p>
+                    </div>
+                </div>
+                <div class="total-section">
+                    <div class="total-label">总计</div>
+                    <div class="total-amount" id="totalAmount">0积分</div>
+                </div>
+                <button class="checkout-btn" onclick="submitOrder()">提交订单</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // PWA: 注册 Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(err => {
+                    console.log('Service Worker 注册失败:', err);
+                });
+            });
+        }
+
+        // 菜单数据（你的原有逻辑）
+        const menuData = [
+            { id: 1, name: "经典牛肉汉堡", description: "100%纯牛肉，新鲜蔬菜，特制酱料", price: "25积分", category: "主食", emoji: "🍔" },
+            { id: 2, name: "香脆炸鸡套餐", description: "外酥里嫩炸鸡，搭配薯条和饮料", price: "20积分", category: "主食", emoji: "🍗" },
+            { id: 3, name: "夏威夷披萨", description: "火腿、菠萝、芝士，美味组合", price: "30积分", category: "主食", emoji: "🍕" },
+            { id: 4, name: "冰镇可乐", description: "经典碳酸饮料，冰爽畅快", price: "8积分", category: "饮品", emoji: "🥤" },
+            { id: 5, name: "鲜榨橙汁", description: "100%新鲜橙子现榨", price: "12积分", category: "饮品", emoji: "🍹" },
+            { id: 6, name: "抹茶拿铁", description: "日式抹茶与牛奶的完美融合", price: "15积分", category: "饮品", emoji: "🍵" },
+            { id: 7, name: "提拉米苏", description: "意大利经典甜点，咖啡与奶香", price: "18积分", category: "甜点", emoji: "🍰" },
+            { id: 8, name: "巧克力熔岩蛋糕", description: "热巧克力流心，搭配香草冰淇淋", price: "22积分", category: "甜点", emoji: "🍫" },
+            { id: 9, name: "薯条", description: "金黄酥脆，搭配特制番茄酱", price: "10积分", category: "小食", emoji: "🍟" },
+            { id: 10, name: "鸡米花", description: "香脆可口，多种口味可选", price: "12积分", category: "小食", emoji: "🍗" },
+            { id: 11, name: "蔬菜沙拉", description: "新鲜时蔬，健康美味", price: "15积分", category: "小食", emoji: "🥗" },
+            { id: 12, name: "水果拼盘", description: "当季新鲜水果，营养丰富", price: "16积分", category: "甜点", emoji: "🍓" }
+        ];
+
+        let currentOrder = [];
+
+        // ——— 以下是你原有的 JS 逻辑（已保留）———
+        function getUrlParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+        function setUrlParameter(paramObj) {
+            const url = new URL(window.location);
+            Object.keys(paramObj).forEach(key => {
+                if (paramObj[key]) {
+                    url.searchParams.set(key, paramObj[key]);
+                } else {
+                    url.searchParams.delete(key);
+                }
+            });
+            window.history.replaceState({}, '', url);
+        }
+        function loadOrderFromUrl() {
+            const orderParam = getUrlParameter('order');
+            if (orderParam) {
+                try {
+                    const decodedOrder = JSON.parse(decodeURIComponent(orderParam));
+                    currentOrder = decodedOrder;
+                } catch (e) {
+                    console.error('Failed to parse order from URL', e);
+                    currentOrder = [];
+                }
+            }
+        }
+        function updateUrlWithOrder() {
+            if (currentOrder.length > 0) {
+                const encodedOrder = encodeURIComponent(JSON.stringify(currentOrder));
+                setUrlParameter({order: encodedOrder});
+            } else {
+                setUrlParameter({order: ''});
+            }
+            updateShareUrl();
+        }
+        function updateShareUrl() {
+            const shareUrlInput = document.getElementById('shareUrl');
+            shareUrlInput.value = window.location.href;
+        }
+        function initMenu() {
+            renderFoodGrid(menuData);
+            setupCategoryFilters();
+            loadOrderFromUrl();
+            updateOrderDisplay();
+            updateShareUrl();
+        }
+        function renderFoodGrid(foods) {
+            const foodGrid = document.getElementById('foodGrid');
+            foodGrid.innerHTML = foods.map(food => `
+                <div class="food-card">
+                    <div class="food-image">${food.emoji}</div>
+                    <div class="food-info">
+                        <div class="food-name">${food.name}</div>
+                        <div class="food-desc">${food.description}</div>
+                        <div class="food-footer">
+                            <div class="food-price">${food.price}</div>
+                            <button class="add-to-cart" onclick="addToOrder(${food.id})">
+                                <span>+</span> 加入
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        function setupCategoryFilters() {
+            const categoryBtns = document.querySelectorAll('.category-btn');
+            categoryBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    categoryBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    const category = this.textContent;
+                    if (category === '全部') {
+                        renderFoodGrid(menuData);
+                    } else {
+                        const filteredFoods = menuData.filter(food => food.category === category);
+                        renderFoodGrid(filteredFoods);
+                    }
+                });
+            });
+        }
+        function addToOrder(foodId) {
+            const food = menuData.find(item => item.id === foodId);
+            if (!food) return;
+            const existingItem = currentOrder.find(item => item.id === foodId);
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                currentOrder.push({ id: food.id, name: food.name, price: food.price, quantity: 1 });
+            }
+            updateOrderDisplay();
+            updateUrlWithOrder();
+        }
+        function updateOrderQuantity(foodId, change) {
+            const itemIndex = currentOrder.findIndex(item => item.id === foodId);
+            if (itemIndex === -1) return;
+            if (change === -1) {
+                if (currentOrder[itemIndex].quantity > 1) {
+                    currentOrder[itemIndex].quantity += change;
+                } else {
+                    currentOrder.splice(itemIndex, 1);
+                }
+            } else {
+                currentOrder[itemIndex].quantity += change;
+            }
+            updateOrderDisplay();
+            updateUrlWithOrder();
+        }
+        function updateOrderDisplay() {
+            const orderItems = document.getElementById('orderItems');
+            const totalAmount = document.getElementById('totalAmount');
+            const clearBtn = document.getElementById('clearBtn');
+            if (currentOrder.length === 0) {
+                orderItems.innerHTML = `<div class="empty-state"><div>🛒</div><p>购物车为空<br>选择菜品开始点餐</p></div>`;
+                totalAmount.textContent = '0积分';
+                clearBtn.style.display = 'none';
+                return;
+            }
+            orderItems.innerHTML = currentOrder.map(item => `
+                <div class="order-item">
+                    <div class="item-info">
+                        <div class="item-name">${item.name}</div>
+                        <div class="item-price">${item.price}</div>
+                    </div>
+                    <div class="item-controls">
+                        <button class="control-btn minus" onclick="updateOrderQuantity(${item.id}, -1)">-</button>
+                        <span class="quantity-display">${item.quantity}</span>
+                        <button class="control-btn" onclick="updateOrderQuantity(${item.id}, 1)">+</button>
+                    </div>
+                </div>
+            `).join('');
+            const priceCounts = {};
+            currentOrder.forEach(item => {
+                priceCounts[item.price] = (priceCounts[item.price] || 0) + item.quantity;
+            });
+            const priceEntries = Object.entries(priceCounts);
+            if (priceEntries.length === 1) {
+                totalAmount.textContent = `${priceEntries[0][1]}${priceEntries[0][0]}`;
+            } else {
+                const totalText = priceEntries.map(([price, count]) => `${count}${price}`).join(' + ');
+                totalAmount.textContent = totalText.length > 20 ? totalText.substring(0, 20) + '...' : totalText;
+            }
+            clearBtn.style.display = 'block';
+        }
+        function clearOrder() {
+            if (currentOrder.length === 0) return;
+            if (confirm('确定要清空所有订单吗？')) {
+                currentOrder = [];
+                updateOrderDisplay();
+                updateUrlWithOrder();
+            }
+        }
+        function submitOrder() {
+            if (currentOrder.length === 0) {
+                alert('请先选择菜品！');
+                return;
+            }
+            const orderSummary = currentOrder.map(item => 
+                `${item.name} x${item.quantity} (${item.price})`
+            ).join('\n');
+            alert(`订单已提交！\n\n您的订单：\n${orderSummary}\n\n总计：${document.getElementById('totalAmount').textContent}\n\n请将上方的分享链接发送给家人查看订单！`);
+        }
+        function copyShareUrl() {
+            const shareUrlInput = document.getElementById('shareUrl');
+            shareUrlInput.select();
+            try {
+                document.execCommand('copy');
+                alert('链接已复制！现在可以发送给家人了。');
+            } catch (err) {
+                alert('复制失败，请手动复制链接。');
+            }
+        }
+        document.addEventListener('DOMContentLoaded', initMenu);
+    </script>
+</body>
+</html>

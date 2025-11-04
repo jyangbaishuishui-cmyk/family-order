@@ -1,23 +1,25 @@
 {
-  "background_color": "#ffffff",
-  "dir": "ltr",
+  "name": "家庭点餐平台",
+  "short_name": "点餐",
+  "description": "家人们可以点餐，订单会生成分享链接",
+  "start_url": "/family-order/",
+  "scope": "/family-order/",
   "display": "standalone",
-  "name": "家庭点餐",
-  "orientation": "any",
-  "scope": "/",
-  "short_name": "我吃吃吃吃吃",
-  "start_url": "/",
+  "background_color": "#f5f5f5",
   "theme_color": "#4facfe",
+  "lang": "zh-CN",
+  "dir": "ltr",
+  "orientation": "any",
   "icons": [
-  {
-      "src": "/family-order/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    },
     {
       "src": "/family-order/icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
-    
+    {
+      "src": "/family-order/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
 }

@@ -3,11 +3,35 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>家庭点餐平台</title>
+    <meta name="description" content="家人们一起点餐的实时协作平台">
     <meta name="theme-color" content="#4facfe">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="家庭点餐">
-    <title>家庭点餐平台</title>
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="application/json,{
+        \"name\": \"家庭点餐平台\",
+        \"short_name\": \"家庭点餐\",
+        \"start_url\": \"/family-order/\",
+        \"display\": \"standalone\",
+        \"background_color\": \"#f5f5f5\",
+        \"theme_color\": \"#4facfe\",
+        \"icons\": [{
+            \"src\": \"/family-order/icon-192.png\",
+            \"sizes\": \"192x192\",
+            \"type\": \"image/png\"
+        },{
+            \"src\": \"/family-order/icon-512.png\",
+            \"sizes\": \"512x512\",
+            \"type\": \"image/png\"
+        }]
+    }">
+
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Ccircle cx='96' cy='96' r='88' fill='%234facfe'/%3E%3Cpath d='M83.5 132.5h25v-25h-25v25zm0-37.5h25v-25h-25v25z' fill='%23fff'/%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Ccircle cx='90' cy='90' r='82' fill='%234facfe'/%3E%3Cpath d='M77 125h26v-26H77v26zm0-38h26v-26H77v26z' fill='%23fff'/%3E%3C/svg%3E">
     <style>
         :root {
             --primary: #4facfe;
@@ -171,6 +195,7 @@
             background: rgba(0, 0, 0, 0.3);
         }
         
+        /* 优化回退按钮样式 */
         .back-btn-global {
             position: absolute;
             left: 16px;
@@ -187,11 +212,16 @@
             justify-content: center;
             cursor: pointer;
             transition: var(--transition);
+            z-index: 10;
         }
         
         .back-btn-global:hover {
             background: rgba(0,0,0,0.3);
             transform: scale(1.05);
+        }
+        
+        .back-btn-global:active {
+            transform: scale(0.95);
         }
         
         .back-btn-global:disabled {
@@ -1428,8 +1458,90 @@
             renderIdentityOptions();
             setupEventListeners();
             updateDateTime();
+            setupBackButtons(); // 专门设置回退按钮
             
             console.log('Application initialized');
+        }
+        
+        // 优化回退按钮功能
+        function setupBackButtons() {
+            console.log('Setting up back buttons...');
+            
+            // 首页回退按钮 - 返回身份选择
+            if (backBtnGlobal) {
+                backBtnGlobal.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    console.log('Home back button clicked');
+                    
+                    if (currentPage === 'homePage') {
+                        showPage('identityPage');
+                    }
+                });
+                
+                // 添加触摸事件支持
+                backBtnGlobal.addEventListener('touchstart', function(e) {
+                    e.stopPropagation();
+                    this.style.transform = 'scale(0.95)';
+                });
+                
+                backBtnGlobal.addEventListener('touchend', function(e) {
+                    e.stopPropagation();
+                    this.style.transform = 'scale(1)';
+                    if (currentPage === 'homePage') {
+                        showPage('identityPage');
+                    }
+                });
+            }
+            
+            // 点餐页面回退按钮 - 返回首页
+            if (backBtnGlobalOrder) {
+                backBtnGlobalOrder.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    console.log('Order back button clicked');
+                    
+                    showPage('homePage');
+                    updateMealStatus();
+                    loadHistory();
+                });
+                
+                // 添加触摸事件支持
+                backBtnGlobalOrder.addEventListener('touchstart', function(e) {
+                    e.stopPropagation();
+                    this.style.transform = 'scale(0.95)';
+                });
+                
+                backBtnGlobalOrder.addEventListener('touchend', function(e) {
+                    e.stopPropagation();
+                    this.style.transform = 'scale(1)';
+                    showPage('homePage');
+                    updateMealStatus();
+                    loadHistory();
+                });
+            }
+            
+            // 管理页面回退按钮 - 返回首页
+            if (backBtnGlobalManagement) {
+                backBtnGlobalManagement.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    console.log('Management back button clicked');
+                    
+                    showPage('homePage');
+                });
+                
+                // 添加触摸事件支持
+                backBtnGlobalManagement.addEventListener('touchstart', function(e) {
+                    e.stopPropagation();
+                    this.style.transform = 'scale(0.95)';
+                });
+                
+                backBtnGlobalManagement.addEventListener('touchend', function(e) {
+                    e.stopPropagation();
+                    this.style.transform = 'scale(1)';
+                    showPage('homePage');
+                });
+            }
+            
+            console.log('Back buttons setup completed');
         }
         
         // Render identity options
@@ -1582,14 +1694,15 @@
         function updateMealStatus() {
             if (!currentUserId || !currentShopId) return;
             
-            const orderKey = `${today}-${currentShopId}`;
-            const dailyOrders = orders[orderKey] || {};
-            
+            // 修复：检查当前用户的订单状态
+            const orderKey = `${today}-${currentShopId}-${currentUserId}`;
+            const userOrders = orders[orderKey] || {};
+
             document.querySelectorAll('.meal-tab').forEach(tab => {
                 const mealType = tab.dataset.meal;
                 const statusElem = tab.querySelector('.meal-status');
-                
-                if (dailyOrders[mealType] && dailyOrders[mealType].foods && dailyOrders[mealType].foods.length > 0) {
+
+                if (userOrders[mealType] && userOrders[mealType].foods && userOrders[mealType].foods.length > 0) {
                     tab.classList.add('order-placed');
                     statusElem.textContent = '已点餐';
                 } else {
@@ -1602,18 +1715,25 @@
         // Load history for display
         function loadHistory() {
             if (!currentUserId || !currentShopId) return;
-            
-            // Get orders for this shop
+
+            // 修复：获取当前店铺的所有用户订单
             const shopOrders = {};
             Object.keys(orders).forEach(key => {
-                if (key.includes(`-${currentShopId}`)) {
-                    const date = key.split('-')[0];
-                    shopOrders[date] = orders[key];
+                if (key.includes(`-${currentShopId}-`)) {
+                    const parts = key.split('-');
+                    const date = parts[0];
+                    const shopId = parts[1];
+                    const userId = parts[2];
+                    
+                    if (!shopOrders[date]) {
+                        shopOrders[date] = {};
+                    }
+                    shopOrders[date][userId] = orders[key];
                 }
             });
-            
+
             const historyKeys = Object.keys(shopOrders).sort((a, b) => new Date(b) - new Date(a)).slice(0, 7);
-            
+
             if (historyKeys.length === 0) {
                 historyList.innerHTML = `
                     <div class="empty-state">
@@ -1623,9 +1743,9 @@
                 `;
                 return;
             }
-            
+
             let historyHTML = '';
-            
+
             historyKeys.forEach(dateStr => {
                 const date = new Date(dateStr);
                 const dateDisplay = date.toLocaleDateString('zh-CN', {
@@ -1633,8 +1753,8 @@
                     day: 'numeric',
                     weekday: 'long'
                 });
-                
-                const dailyOrders = shopOrders[dateStr] || {};
+
+                const dailyUserOrders = shopOrders[dateStr] || {};
                 
                 historyHTML += `
                     <div class="history-item">
@@ -1642,66 +1762,69 @@
                         <div class="history-meals">
                             <div class="history-meal">
                                 <div class="meal-type">早餐</div>
-                                <div class="meal-content ${!dailyOrders.breakfast || dailyOrders.breakfast.foods.length === 0 ? 'empty' : ''}">
-                                    ${dailyOrders.breakfast && dailyOrders.breakfast.foods.length > 0 ? 
-                                        dailyOrders.breakfast.foods.map(item => item.name).join(', ') : '未点餐'}
-                                </div>
-                                ${dailyOrders.breakfast && dailyOrders.breakfast.foods.length > 0 ? 
-                                    `<div class="orderer-info">
-                                        <div class="orderer-icon" style="color: ${getIdentityColor(dailyOrders.breakfast.userId)}; border-color: ${getIdentityColor(dailyOrders.breakfast.userId)};">
-                                            ${getIdentityInitial(dailyOrders.breakfast.userId)}
-                                        </div>
-                                        ${getIdentityName(dailyOrders.breakfast.userId)}
-                                    </div>` : ''}
+                                ${renderMealHistory(dailyUserOrders, 'breakfast')}
                             </div>
                             <div class="history-meal">
                                 <div class="meal-type">午餐</div>
-                                <div class="meal-content ${!dailyOrders.lunch || dailyOrders.lunch.foods.length === 0 ? 'empty' : ''}">
-                                    ${dailyOrders.lunch && dailyOrders.lunch.foods.length > 0 ? 
-                                        dailyOrders.lunch.foods.map(item => item.name).join(', ') : '未点餐'}
-                                </div>
-                                ${dailyOrders.lunch && dailyOrders.lunch.foods.length > 0 ? 
-                                    `<div class="orderer-info">
-                                        <div class="orderer-icon" style="color: ${getIdentityColor(dailyOrders.lunch.userId)}; border-color: ${getIdentityColor(dailyOrders.lunch.userId)};">
-                                            ${getIdentityInitial(dailyOrders.lunch.userId)}
-                                        </div>
-                                        ${getIdentityName(dailyOrders.lunch.userId)}
-                                    </div>` : ''}
+                                ${renderMealHistory(dailyUserOrders, 'lunch')}
                             </div>
                             <div class="history-meal">
                                 <div class="meal-type">晚餐</div>
-                                <div class="meal-content ${!dailyOrders.dinner || dailyOrders.dinner.foods.length === 0 ? 'empty' : ''}">
-                                    ${dailyOrders.dinner && dailyOrders.dinner.foods.length > 0 ? 
-                                        dailyOrders.dinner.foods.map(item => item.name).join(', ') : '未点餐'}
-                                </div>
-                                ${dailyOrders.dinner && dailyOrders.dinner.foods.length > 0 ? 
-                                    `<div class="orderer-info">
-                                        <div class="orderer-icon" style="color: ${getIdentityColor(dailyOrders.dinner.userId)}; border-color: ${getIdentityColor(dailyOrders.dinner.userId)};">
-                                            ${getIdentityInitial(dailyOrders.dinner.userId)}
-                                        </div>
-                                        ${getIdentityName(dailyOrders.dinner.userId)}
-                                    </div>` : ''}
+                                ${renderMealHistory(dailyUserOrders, 'dinner')}
                             </div>
                             <div class="history-meal">
                                 <div class="meal-type">夜宵</div>
-                                <div class="meal-content ${!dailyOrders.night || dailyOrders.night.foods.length === 0 ? 'empty' : ''}">
-                                    ${dailyOrders.night && dailyOrders.night.foods.length > 0 ? 
-                                        dailyOrders.night.foods.map(item => item.name).join(', ') : '未点餐'}
-                                </div>
-                                ${dailyOrders.night && dailyOrders.night.foods.length > 0 ? 
-                                    `<div class="orderer-info">
-                                        <div class="orderer-icon" style="color: ${getIdentityColor(dailyOrders.night.userId)}; border-color: ${getIdentityColor(dailyOrders.night.userId)};">
-                                            ${getIdentityInitial(dailyOrders.night.userId)}
-                                        </div>
-                                        ${getIdentityName(dailyOrders.night.userId)}
-                                    </div>` : ''}
+                                ${renderMealHistory(dailyUserOrders, 'night')}
                             </div>
                         </div>
                     </div>
                 `;
             });
-            
+
             historyList.innerHTML = historyHTML;
+        }
+
+        // 新增辅助函数来渲染餐食历史
+        function renderMealHistory(dailyUserOrders, mealType) {
+            let html = '';
+            let hasOrders = false;
+            
+            // 收集该餐次的所有用户订单
+            const mealOrders = [];
+            Object.keys(dailyUserOrders).forEach(userId => {
+                const userOrder = dailyUserOrders[userId][mealType];
+                if (userOrder && userOrder.foods && userOrder.foods.length > 0) {
+                    mealOrders.push({
+                        userId: userId,
+                        foods: userOrder.foods
+                    });
+                    hasOrders = true;
+                }
+            });
+            
+            if (!hasOrders) {
+                return `
+                    <div class="meal-content empty">未点餐</div>
+                `;
+            }
+            
+            // 显示所有用户的订单
+            mealOrders.forEach(order => {
+                const foodNames = order.foods.map(item => item.name).join(', ');
+                html += `
+                    <div class="meal-content">
+                        ${foodNames}
+                        <div class="orderer-info">
+                            <div class="orderer-icon" style="color: ${getIdentityColor(order.userId)}; border-color: ${getIdentityColor(order.userId)};">
+                                ${getIdentityInitial(order.userId)}
+                            </div>
+                            ${getIdentityName(order.userId)}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            return html;
         }
         
         // Helper functions for identity data
@@ -1741,17 +1864,12 @@
             currentMealTitle.textContent = mealTitles[currentMealType];
             renderUserDisplay();
             
-            // Load existing selections if any
-            const orderKey = `${today}-${currentShopId}`;
-            const dailyOrders = orders[orderKey] || {};
-            const currentOrder = dailyOrders[currentMealType] || {};
-            
-            // Only load selections if this user is the one who placed the order
-            if (currentOrder.userId === currentUserId) {
-                selectedFoods = currentOrder.foods || [];
-            } else {
-                selectedFoods = [];
-            }
+            // 修复：只加载当前用户的订单
+            const orderKey = `${today}-${currentShopId}-${currentUserId}`;
+            const userOrders = orders[orderKey] || {};
+            const currentOrder = userOrders[currentMealType] || {};
+
+            selectedFoods = currentOrder.foods || [];
             
             // Render categories and foods
             renderCategories();
@@ -1893,28 +2011,30 @@
                 showNotification('请先选择身份和店铺', 'error');
                 return;
             }
+
+            // 修复：创建基于身份和店铺的唯一订单键
+            const orderKey = `${today}-${currentShopId}-${currentUserId}`;
+            const mealKey = `${currentMealType}`;
             
-            // Check if this is a new order or modification
-            const orderKey = `${today}-${currentShopId}`;
-            const dailyOrders = orders[orderKey] || {};
-            const existingOrder = dailyOrders[currentMealType];
-            const isModification = existingOrder && existingOrder.userId === currentUserId;
+            // 保存当前用户的订单，不影响其他用户
+            if (!orders[orderKey]) {
+                orders[orderKey] = {};
+            }
             
-            // Save to local storage for current user and shop
-            dailyOrders[currentMealType] = {
+            orders[orderKey][mealKey] = {
                 userId: currentUserId,
-                foods: selectedFoods
+                foods: selectedFoods,
+                timestamp: new Date().toISOString()
             };
-            orders[orderKey] = dailyOrders;
+            
             saveOrders();
-            
+
             // Send notifications to bound users
-            sendOrderNotifications(currentMealType, selectedFoods, isModification);
-            
+            sendOrderNotifications(currentMealType, selectedFoods, false);
+
             // Update UI
-            const actionText = isModification ? '修改' : '点餐';
-            showNotification(`✅ ${currentMealTitle.textContent}${actionText}成功！`);
-            
+            showNotification(`✅ ${currentMealTitle.textContent}点餐成功！`);
+
             // Return to home page after delay
             setTimeout(() => {
                 showPage('homePage');
@@ -1939,11 +2059,11 @@
                     const message = `${currentUser.name} 在 ${currentShop.name} ${actionText} ${mealType}: ${foodNames}`;
                     
                     // In a real app, this would send a push notification
-                    // For this demo, we'll just log it and show a notification
+                    // For this demo, we'll just log it
                     console.log(`发送通知给 ${getIdentityName(identityId)}: ${message}`);
                     
-                    // Show a notification in the app
-                    showNotification(`🔔 ${getIdentityName(identityId)} 收到通知: ${message}`);
+                    // 可以选择在界面上显示通知
+                    // showNotification(`🔔 ${getIdentityName(identityId)} 收到通知: ${message}`);
                 }
             });
         }
@@ -1977,6 +2097,9 @@
             // Reset form
             newIdentityName.value = '';
             newIdentityForm.style.display = 'none';
+            
+            // 修复：重新渲染身份选择界面
+            renderIdentityOptions();
             
             // Select the new identity
             selectIdentity(newIdentity);
@@ -2064,27 +2187,27 @@
             if (pageId === 'identityPage') {
                 // Identity page - hide navigation
                 globalNav.style.display = 'none';
-                backBtnGlobal.style.display = 'none';
+                if (backBtnGlobal) backBtnGlobal.style.display = 'none';
             } else {
                 // Other pages - show navigation and back buttons
                 globalNav.style.display = 'flex';
-                backBtnGlobal.style.display = 'flex';
+                if (backBtnGlobal) backBtnGlobal.style.display = 'flex';
                 
                 if (pageId === 'homePage') {
-                    backBtnGlobal.textContent = '👤';
-                    backBtnGlobal.onclick = function() {
-                        showPage('identityPage');
-                    };
+                    if (backBtnGlobal) {
+                        backBtnGlobal.textContent = '👤';
+                        backBtnGlobal.style.display = 'flex';
+                    }
+                    if (backBtnGlobalOrder) backBtnGlobalOrder.style.display = 'none';
+                    if (backBtnGlobalManagement) backBtnGlobalManagement.style.display = 'none';
                 } else if (pageId === 'orderPage') {
-                    backBtnGlobal.textContent = '←';
-                    backBtnGlobal.onclick = function() {
-                        showPage('homePage');
-                    };
+                    if (backBtnGlobal) backBtnGlobal.style.display = 'none';
+                    if (backBtnGlobalOrder) backBtnGlobalOrder.style.display = 'flex';
+                    if (backBtnGlobalManagement) backBtnGlobalManagement.style.display = 'none';
                 } else if (pageId === 'managementPage') {
-                    backBtnGlobal.textContent = '←';
-                    backBtnGlobal.onclick = function() {
-                        showPage('homePage');
-                    };
+                    if (backBtnGlobal) backBtnGlobal.style.display = 'none';
+                    if (backBtnGlobalOrder) backBtnGlobalOrder.style.display = 'none';
+                    if (backBtnGlobalManagement) backBtnGlobalManagement.style.display = 'flex';
                     renderManagementPage();
                 }
             }
@@ -2425,23 +2548,12 @@
                 if (selectedFoods.length > 0 && confirm('确定要清空所有选择吗？')) {
                     selectedFoods = [];
                     updateSelectedItemsDisplay();
-                    renderCategories(); // Refresh food display
+                    renderCategories();
                     showNotification('已清空所有选择');
                 }
             });
             
             submitOrderBtn.addEventListener('click', submitOrder);
-            
-            // Navigation events
-            backBtnGlobalOrder.addEventListener('click', function() {
-                showPage('homePage');
-                updateMealStatus();
-                loadHistory();
-            });
-            
-            backBtnGlobalManagement.addEventListener('click', function() {
-                showPage('homePage');
-            });
             
             // Global navigation
             globalNav.addEventListener('click', function(e) {
@@ -2460,7 +2572,7 @@
             resetAllDataBtn.addEventListener('click', function() {
                 if (confirm('确定要重置所有数据吗？这将删除所有身份、店铺和点餐记录，且无法恢复！')) {
                     localStorage.clear();
-                    location.reload(); // Reload the page to reset everything
+                    location.reload();
                 }
             });
             
@@ -2494,6 +2606,8 @@
             importDataBtn.addEventListener('click', function() {
                 showNotification('导入数据功能将在后续版本中完善');
             });
+            
+            console.log('Event listeners setup completed');
         }
         
         // Generate unique ID
